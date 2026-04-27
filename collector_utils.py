@@ -20,6 +20,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 from dotenv import load_dotenv
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
+import gspread
+from google.oauth2.service_account import Credentials
+
 COMPANY_NAME = os.environ.get("COMPANY_NAME", "자사")
 
 COMPETITORS_FILE = os.path.join(BASE_DIR, "competitors.json")
@@ -27,162 +30,123 @@ KEYWORDS_FILE = os.path.join(BASE_DIR, "keywords.json")
 TREND_KEYWORDS_FILE = os.path.join(BASE_DIR, "trend_keywords.json")
 RANK_KEYWORDS_FILE = os.path.join(BASE_DIR, "rank_keywords.json")
 
-MEDIA_MAP = {
-    "yna.co.kr": "연합뉴스",
-    "news.naver.com": "네이버뉴스",
-    "chosun.com": "조선일보",
-    "donga.com": "동아일보",
-    "hani.co.kr": "한겨레",
-    "khan.co.kr": "경향신문",
-    "sedaily.com": "서울경제",
-    "hankyung.com": "한국경제",
-    "mk.co.kr": "매일경제",
-    "mt.co.kr": "머니투데이",
-    "edaily.co.kr": "이데일리",
-    "news1.kr": "뉴스1",
-    "newsis.com": "뉴시스",
-    "daily.hankooki.com": "데일리한국",
-    "hankookilbo.com": "한국일보",
-    "segye.com": "세계일보",
-    "kmib.co.kr": "국민일보",
-    "munhwa.com": "문화일보",
-    "busan.com": "부산일보",
-    "imaeil.com": "매일신문",
-    "kukinews.com": "쿠키뉴스",
-    "nocutnews.co.kr": "노컷뉴스",
-    "ohmynews.com": "오마이뉴스",
-    "pressian.com": "프레시안",
-    "mediatoday.co.kr": "미디어오늘",
-    "sisain.co.kr": "시사IN",
-    "vop.co.kr": "민중의소리",
-    "dailian.co.kr": "데일리안",
-    "viewsnnews.com": "뷰스앤뉴스",
-    "newdaily.co.kr": "뉴데일리",
-    "sbs.co.kr": "SBS",
-    "kbs.co.kr": "KBS",
-    "mbc.co.kr": "MBC",
-    "ytn.co.kr": "YTN",
-    "news.tvchosun.com": "TV조선",
-    "channela.com": "채널A",
-    "jtbc.co.kr": "JTBC",
-    "mbn.co.kr": "MBN",
-    "ebs.co.kr": "EBS",
-    "zdnet.co.kr": "ZDNet Korea",
-    "bloter.net": "블로터",
-    "inews24.com": "아이뉴스24",
-    "digitaltoday.co.kr": "디지털투데이",
-    "dt.co.kr": "디지털타임스",
-    "etnews.com": "전자신문",
-    "koit.co.kr": "정보통신신문",
-    "ksilbo.co.kr": "경상일보",
-    "kwnews.co.kr": "강원일보",
-    "kyeonggi.com": "경기일보",
-    "kyeongin.com": "경인일보",
-    "kyongbuk.co.kr": "경북일보",
-    "ngetnews.com": "뉴스저널리즘",
-    "newsjisang.com": "뉴스지상",
-    "efnews.co.kr": "파이낸셜신문",
-    "hq-times.com": "HQ타임스",
-    "shinailbo.co.kr": "신아일보",
-    "dizzotv.com": "디지틀조선TV",
-    "geconomy.co.kr": "지이코노미",
-    "cnbizm.com": "CNB뉴스",
-    "m-i.kr": "매일일보",
-    "ccnnews.co.kr": "충청뉴스",
-    "ccdn.co.kr": "충청일보",
-    "newspim.com": "뉴스핌",
-    "asiae.co.kr": "아시아경제",
-    "kbsm.net": "경북신문",
-    "hidomin.com": "경북도민일보",
-    "metroseoul.co.kr": "메트로신문",
-    "dnews.co.kr": "대한경제",
-    "joseilbo.com": "조세일보",
-    "seoul.co.kr": "서울신문",
-    "mhnse.com": "MHN스포츠",
-    "sportschosun.com": "스포츠조선",
-    "sports.donga.com": "스포츠동아",
-    "starnewskorea.com": "스타뉴스",
-    "gukjenews.com": "국제뉴스",
-    "etoday.co.kr": "이투데이",
-    "ajunews.com": "아주경제",
-    "heraldcorp.com": "헤럴드경제",
-    "wowtv.co.kr": "한국경제TV",
-    "bizwnews.com": "비즈월드",
-    "lawissue.co.kr": "로이슈",
-    "beyondpost.co.kr": "비욘드포스트",
-    "pointp.co.kr": "포인트데일리",
-}
+def get_gspread_client():
+    """구글 시트 클라이언트를 반환합니다."""
+    scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
+    
+    # 1. Streamlit Secrets 확인 (클라우드 배포용)
+    try:
+        import streamlit as st
+        if "GCP_SERVICE_ACCOUNT" in st.secrets:
+            creds_dict = json.loads(st.secrets["GCP_SERVICE_ACCOUNT"])
+            creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+            return gspread.authorize(creds)
+    except:
+        pass
 
-def get_media_name(domain):
-    domain = domain.replace("www.", "")
-    if domain in MEDIA_MAP:
-        return MEDIA_MAP[domain]
-    for key, val in MEDIA_MAP.items():
-        if key in domain:
-            return val
-    return domain
+    # 2. 로컬 .env 및 파일 확인
+    creds_file = os.environ.get("GOOGLE_CREDENTIALS_FILE", "google-key.json")
+    if not os.path.isabs(creds_file):
+        creds_file = os.path.join(BASE_DIR, creds_file)
+    
+    if os.path.exists(creds_file):
+        creds = Credentials.from_service_account_file(creds_file, scopes=scopes)
+        return gspread.authorize(creds)
+    
+    return None
+
+def get_worksheet(sheet_name):
+    """지정된 이름의 워크시트를 가져오거나 없으면 생성합니다."""
+    sheet_id = os.environ.get("GOOGLE_SHEET_ID")
+    if not sheet_id: return None
+    
+    try:
+        client = get_gspread_client()
+        if not client: return None
+        spreadsheet = client.open_by_key(sheet_id)
+        try:
+            return spreadsheet.worksheet(sheet_name)
+        except gspread.exceptions.WorksheetNotFound:
+            if sheet_name == "경쟁사관리":
+                ws = spreadsheet.add_worksheet(title=sheet_name, rows="100", cols="2")
+                ws.append_row(["업체명", "블로그URL"])
+                return ws
+            elif "키워드" in sheet_name:
+                ws = spreadsheet.add_worksheet(title=sheet_name, rows="100", cols="1")
+                ws.append_row(["키워드"])
+                return ws
+    except Exception as e:
+        print(f"구글 시트 접근 오류 ({sheet_name}): {e}")
+    return None
 
 def load_competitors():
+    ws = get_worksheet("경쟁사관리")
+    if ws:
+        rows = ws.get_all_records()
+        if rows:
+            return [{"name": r["업체명"], "url": r["블로그URL"]} for r in rows if r["업체명"] and r["블로그URL"]]
+    
     if os.path.exists(COMPETITORS_FILE):
         try:
             with open(COMPETITORS_FILE, 'r', encoding='utf-8') as f:
                 return json.load(f)
-        except Exception as e:
-            print(f"COMPETITORS LOAD ERROR: {e}")
-            return []
+        except: pass
     return []
 
 def save_competitors(data):
+    ws = get_worksheet("경쟁사관리")
+    if ws:
+        ws.clear()
+        ws.append_row(["업체명", "블로그URL"])
+        if data:
+            rows = [[d["name"], d["url"]] for d in data]
+            ws.append_rows(rows)
+    
     with open(COMPETITORS_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-def load_keywords():
-    if os.path.exists(KEYWORDS_FILE):
+def load_keywords_generic(sheet_name, file_path, default_list):
+    ws = get_worksheet(sheet_name)
+    if ws:
+        values = ws.get_all_values()
+        if len(values) > 1:
+            return [row[0] for row in values[1:] if row[0]]
+            
+    if os.path.exists(file_path):
         try:
-            with open(KEYWORDS_FILE, 'r', encoding='utf-8') as f:
+            with open(file_path, 'r', encoding='utf-8') as f:
                 return json.load(f)
-        except Exception as e:
-            print(f"KEYWORDS LOAD ERROR: {e}")
-            return ["LED 전광판"]
-    return ["LED 전광판"]
+        except: pass
+    return default_list
+
+def save_keywords_generic(sheet_name, file_path, data):
+    ws = get_worksheet(sheet_name)
+    if ws:
+        ws.clear()
+        ws.append_row(["키워드"])
+        if data:
+            ws.append_rows([[d] for d in data])
+            
+    with open(file_path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+def load_keywords():
+    return load_keywords_generic("뉴스키워드관리", KEYWORDS_FILE, ["LED 전광판"])
 
 def save_keywords(data):
-    with open(KEYWORDS_FILE, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    save_keywords_generic("뉴스키워드관리", KEYWORDS_FILE, data)
 
 def load_rank_keywords():
-    if os.path.exists(RANK_KEYWORDS_FILE):
-        try:
-            with open(RANK_KEYWORDS_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except Exception as e:
-            print(f"RANK KEYWORDS LOAD ERROR: {e}")
-            return [COMPANY_NAME, "LED전광판"]
-    return [COMPANY_NAME, "LED전광판"]
-
-def load_trend_keywords():
-    if not os.path.exists(TREND_KEYWORDS_FILE):
-        try:
-            news_kws = load_keywords()
-            save_trend_keywords(news_kws)
-            return news_kws
-        except:
-            return [COMPANY_NAME]
-    
-    try:
-        with open(TREND_KEYWORDS_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except Exception as e:
-        print(f"TREND KEYWORDS LOAD ERROR: {e}")
-        return [COMPANY_NAME]
-
-def save_trend_keywords(data):
-    with open(TREND_KEYWORDS_FILE, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=4)
+    return load_keywords_generic("상위노출키워드관리", RANK_KEYWORDS_FILE, [COMPANY_NAME, "LED전광판"])
 
 def save_rank_keywords(data):
-    with open(RANK_KEYWORDS_FILE, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    save_keywords_generic("상위노출키워드관리", RANK_KEYWORDS_FILE, data)
+
+def load_trend_keywords():
+    return load_keywords_generic("트렌드키워드관리", TREND_KEYWORDS_FILE, [COMPANY_NAME])
+
+def save_trend_keywords(data):
+    save_keywords_generic("트렌드키워드관리", TREND_KEYWORDS_FILE, data)
 
 def extract_naver_blog_id(url):
     match = re.search(r'blog\.naver\.com/([^/?]+)', url)

@@ -30,6 +30,46 @@ KEYWORDS_FILE = os.path.join(BASE_DIR, "keywords.json")
 TREND_KEYWORDS_FILE = os.path.join(BASE_DIR, "trend_keywords.json")
 RANK_KEYWORDS_FILE = os.path.join(BASE_DIR, "rank_keywords.json")
 
+MEDIA_MAP = {
+    "yna.co.kr": "연합뉴스", "news.naver.com": "네이버뉴스", "chosun.com": "조선일보",
+    "donga.com": "동아일보", "hani.co.kr": "한겨레", "khan.co.kr": "경향신문",
+    "sedaily.com": "서울경제", "hankyung.com": "한국경제", "mk.co.kr": "매일경제",
+    "mt.co.kr": "머니투데이", "edaily.co.kr": "이데일리", "news1.kr": "뉴스1",
+    "newsis.com": "뉴시스", "daily.hankooki.com": "데일리한국", "hankookilbo.com": "한국일보",
+    "segye.com": "세계일보", "kmib.co.kr": "국민일보", "munhwa.com": "문화일보",
+    "busan.com": "부산일보", "imaeil.com": "매일신문", "kukinews.com": "쿠키뉴스",
+    "nocutnews.co.kr": "노컷뉴스", "ohmynews.com": "오마이뉴스", "pressian.com": "프레시안",
+    "mediatoday.co.kr": "미디어오늘", "sisain.co.kr": "시사IN", "vop.co.kr": "민중의소리",
+    "dailian.co.kr": "데일리안", "viewsnnews.com": "뷰스앤뉴스", "newdaily.co.kr": "뉴데일리",
+    "sbs.co.kr": "SBS", "kbs.co.kr": "KBS", "mbc.co.kr": "MBC", "ytn.co.kr": "YTN",
+    "news.tvchosun.com": "TV조선", "channela.com": "채널A", "jtbc.co.kr": "JTBC",
+    "mbn.co.kr": "MBN", "ebs.co.kr": "EBS", "zdnet.co.kr": "ZDNet Korea",
+    "bloter.net": "블로터", "inews24.com": "아이뉴스24", "digitaltoday.co.kr": "디지털투데이",
+    "dt.co.kr": "디지털타임스", "etnews.com": "전자신문", "koit.co.kr": "정보통신신문",
+    "ksilbo.co.kr": "경상일보", "kwnews.co.kr": "강원일보", "kyeonggi.com": "경기일보",
+    "kyeongin.com": "경인일보", "kyongbuk.co.kr": "경북일보", "ngetnews.com": "뉴스저널리즘",
+    "newsjisang.com": "뉴스지상", "efnews.co.kr": "파이낸셜신문", "hq-times.com": "HQ타임스",
+    "shinailbo.co.kr": "신아일보", "dizzotv.com": "디지틀조선TV", "geconomy.co.kr": "지이코노미",
+    "cnbizm.com": "CNB뉴스", "m-i.kr": "매일일보", "ccnnews.co.kr": "충청뉴스",
+    "ccdn.co.kr": "충청일보", "newspim.com": "뉴스핌", "asiae.co.kr": "아시아경제",
+    "kbsm.net": "경북신문", "hidomin.com": "경북도민일보", "metroseoul.co.kr": "메트로신문",
+    "dnews.co.kr": "대한경제", "joseilbo.com": "조세일보", "seoul.co.kr": "서울신문",
+    "mhnse.com": "MHN스포츠", "sportschosun.com": "스포츠조선", "sports.donga.com": "스포츠동아",
+    "starnewskorea.com": "스타뉴스", "gukjenews.com": "국제뉴스", "etoday.co.kr": "이투데이",
+    "ajunews.com": "아주경제", "heraldcorp.com": "헤럴드경제", "wowtv.co.kr": "한국경제TV",
+    "bizwnews.com": "비즈월드", "lawissue.co.kr": "로이슈", "beyondpost.co.kr": "비욘드포스트",
+    "pointp.co.kr": "포인트데일리",
+}
+
+def get_media_name(domain):
+    domain = domain.replace("www.", "")
+    if domain in MEDIA_MAP:
+        return MEDIA_MAP[domain]
+    for key, val in MEDIA_MAP.items():
+        if key in domain:
+            return val
+    return domain
+
 def get_gspread_client():
     """구글 시트 클라이언트를 반환합니다."""
     scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]

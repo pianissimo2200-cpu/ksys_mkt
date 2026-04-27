@@ -1,0 +1,41 @@
+name: Daily Market Sync
+
+on:
+  schedule:
+    # 00:00 UTC is 09:00 KST
+    - cron: '0 0 * * *'
+  workflow_dispatch: # 수동 실행 허용
+
+jobs:
+  sync_and_briefing:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Run Auto Sync & Slack Briefing
+      env:
+        COMPANY_NAME: ${{ secrets.COMPANY_NAME }}
+        NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+        NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+        SA_API_KEY: ${{ secrets.SA_API_KEY }}
+        SA_SECRET_KEY: ${{ secrets.SA_SECRET_KEY }}
+        SA_CUSTOMER_ID: ${{ secrets.SA_CUSTOMER_ID }}
+        GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      run: |
+        # GCP Service Account JSON 키 파일을 환경 변수에서 생성
+        echo '${{ secrets.GCP_SERVICE_ACCOUNT }}' > google-key.json
+        export GOOGLE_CREDENTIALS_FILE=google-key.json
+        python auto_sync_sheets.py

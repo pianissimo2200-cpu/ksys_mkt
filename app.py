@@ -46,11 +46,19 @@ def fetch_naver_search_volume(keyword):
 def fetch_naver_datalab_trend(keywords, start_date, end_date, gender=None, ages=None, time_unit='month'):
     return utils.fetch_naver_datalab_trend(keywords, start_date, end_date, CLIENT_ID, CLIENT_SECRET, time_unit=time_unit, gender=gender, ages=ages)
 
+def get_secret(key, default=""):
+    """st.secrets에서 값을 안전하게 가져옵니다. 로컬 환경에서 secrets.toml이 없을 때의 에러를 방지합니다."""
+    try:
+        import streamlit as st
+        return st.secrets.get(key, default)
+    except Exception:
+        return default
+
 def check_password():
     """비밀번호가 맞는지 확인합니다. 맞으면 True, 틀리면 로그인 화면을 출력합니다."""
     def password_entered():
         # Secrets에 설정이 없으면 'ksys1234'를 기본 비밀번호로 사용
-        correct_password = st.secrets.get("APP_PASSWORD", "ksys1234")
+        correct_password = get_secret("APP_PASSWORD", "ksys1234")
         if st.session_state["password"] == correct_password:
             st.session_state["password_correct"] = True
             del st.session_state["password"]  # 보안을 위해 세션에서 비밀번호 삭제
@@ -187,14 +195,16 @@ def main():
             st.markdown("블로그 본문을 분석하고 AI가 글과 이미지를 자동 생성하기 위해 설정이 필요합니다.")
             
             c1, c2 = st.columns([0.8, 0.2])
-            gemini_key = c1.text_input("Gemini API Key", type="password", value=os.environ.get("GEMINI_API_KEY", ""))
+            default_gemini = os.environ.get("GEMINI_API_KEY", get_secret("GEMINI_API_KEY", ""))
+            gemini_key = c1.text_input("Gemini API Key", type="password", value=default_gemini)
             if c2.button("Gemini 키 확인", use_container_width=True):
                 is_valid, msg = ai_utils.validate_gemini_key(gemini_key)
                 if is_valid: st.success(f"✅ {msg}")
                 else: st.error(f"❌ {msg}")
             
             c3, c4 = st.columns([0.8, 0.2])
-            openai_key = c3.text_input("OpenAI API Key", type="password", value=os.environ.get("OPENAI_API_KEY", ""))
+            default_openai = os.environ.get("OPENAI_API_KEY", get_secret("OPENAI_API_KEY", ""))
+            openai_key = c3.text_input("OpenAI API Key", type="password", value=default_openai)
             if c4.button("OpenAI 키 확인", use_container_width=True):
                 is_valid, msg = ai_utils.validate_openai_key(openai_key)
                 if is_valid: st.success(f"✅ {msg}")

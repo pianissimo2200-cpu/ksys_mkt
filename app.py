@@ -186,7 +186,14 @@ def main():
                     df.insert(0, '키워드', kw)
                     all_news.append(df)
             if all_news:
-                st.dataframe(pd.concat(all_news), use_container_width=True, hide_index=True)
+                st.dataframe(
+                    pd.concat(all_news), 
+                    use_container_width=True, 
+                    hide_index=True,
+                    column_config={
+                        "링크": st.column_config.LinkColumn("링크", display_text="🔗 링크 열기")
+                    }
+                )
 
     elif selected_menu == "🏢 경쟁사 최신 포스팅 스크랩 통합":
         st.subheader("🏢 경쟁사 최신 포스팅 분석 및 AI 콘텐츠 어시스턴트")
@@ -231,7 +238,14 @@ def main():
 
         if 'latest_blogs' in st.session_state and st.session_state['latest_blogs']:
             blogs_df = pd.DataFrame(st.session_state['latest_blogs'])
-            st.dataframe(blogs_df[['업체명', '발행일', '제목', '링크']], use_container_width=True, hide_index=True)
+            st.dataframe(
+                blogs_df[['업체명', '발행일', '제목', '링크']], 
+                use_container_width=True, 
+                hide_index=True,
+                column_config={
+                    "링크": st.column_config.LinkColumn("링크", display_text="🔗 포스팅 열기")
+                }
+            )
             
             st.divider()
             st.markdown("### 🤖 분석 및 콘텐츠 자동 생성")

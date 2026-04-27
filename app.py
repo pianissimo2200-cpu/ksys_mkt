@@ -49,7 +49,9 @@ def fetch_naver_datalab_trend(keywords, start_date, end_date, gender=None, ages=
 def check_password():
     """비밀번호가 맞는지 확인합니다. 맞으면 True, 틀리면 로그인 화면을 출력합니다."""
     def password_entered():
-        if st.session_state["password"] == st.secrets["APP_PASSWORD"]:
+        # Secrets에 설정이 없으면 'ksys1234'를 기본 비밀번호로 사용
+        correct_password = st.secrets.get("APP_PASSWORD", "ksys1234")
+        if st.session_state["password"] == correct_password:
             st.session_state["password_correct"] = True
             del st.session_state["password"]  # 보안을 위해 세션에서 비밀번호 삭제
         else:

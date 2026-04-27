@@ -77,6 +77,10 @@ def check_password():
 def main():
     st.set_page_config(page_title="마케팅 인사이트 대시보드", page_icon="📈", layout="wide")
     
+    # API 키 초기 로드 (함수 최상단에서 선언하여 에러 방지)
+    st.session_state['gemini_key'] = os.environ.get("GEMINI_API_KEY", get_secret("GEMINI_API_KEY", ""))
+    st.session_state['openai_key'] = os.environ.get("OPENAI_API_KEY", get_secret("OPENAI_API_KEY", ""))
+    
     if not check_password():
         st.stop()  # 비밀번호가 틀리면 여기서 멈춤
     
@@ -99,10 +103,6 @@ def main():
     # --- 사이드바 영역 ---
     with st.sidebar:
         st.title("⚙️ 설정")
-        
-        # API 키 공통 로드 (어느 메뉴에서든 사용할 수 있도록)
-        gemini_key = os.environ.get("GEMINI_API_KEY", get_secret("GEMINI_API_KEY", ""))
-        openai_key = os.environ.get("OPENAI_API_KEY", get_secret("OPENAI_API_KEY", ""))
         
         # 1. 수집 기간 설정
         st.markdown("##### 📅 데이터 수집 기간")
@@ -206,16 +206,16 @@ def main():
             st.markdown("블로그 본문을 분석하고 AI가 글과 이미지를 자동 생성하기 위해 설정이 필요합니다.")
             
             c1, c2 = st.columns([0.8, 0.2])
-            gemini_key = c1.text_input("Gemini API Key", type="password", value=gemini_key)
+            st.session_state['gemini_key'] = c1.text_input("Gemini API Key", type="password", value=st.session_state['gemini_key'])
             if c2.button("Gemini 키 확인", use_container_width=True):
-                is_valid, msg = ai_utils.validate_gemini_key(gemini_key)
+                is_valid, msg = ai_utils.validate_gemini_key(st.session_state['gemini_key'])
                 if is_valid: st.success(f"✅ {msg}")
                 else: st.error(f"❌ {msg}")
             
             c3, c4 = st.columns([0.8, 0.2])
-            openai_key = c3.text_input("OpenAI API Key", type="password", value=openai_key)
+            st.session_state['openai_key'] = c3.text_input("OpenAI API Key", type="password", value=st.session_state['openai_key'])
             if c4.button("OpenAI 키 확인", use_container_width=True):
-                is_valid, msg = ai_utils.validate_openai_key(openai_key)
+                is_valid, msg = ai_utils.validate_openai_key(st.session_state['openai_key'])
                 if is_valid: st.success(f"✅ {msg}")
                 else: st.error(f"❌ {msg}")
                     
@@ -264,7 +264,7 @@ def main():
             
             if col_btn.button("✨ 콘텐츠 생성 시작", use_container_width=True):
                 m_type = 'gemini' if "Gemini" in ai_model else 'gpt'
-                target_key = gemini_key if m_type == 'gemini' else openai_key
+                target_key = st.session_state['gemini_key'] if m_type == 'gemini' else st.session_state['openai_key']
                 
                 if not target_key and ("글" in gen_option or "모두" in gen_option):
                     st.error(f"텍스트 생성을 위해 {m_type.upper()} API Key를 입력해주세요.")
@@ -297,7 +297,7 @@ def main():
                             # 이미지 생성
                             if "이미지" in gen_option or "모두" in gen_option:
                                 with st.spinner("DALL-E 3가 썸네일 이미지를 생성하는 중..."):
-                                    img_url, img_err = ai_utils.generate_blog_image(topic_summary, openai_key)
+                                    img_url, img_err = ai_utils.generate_blog_image(topic_summary, st.session_state['openai_key'])
                                     if img_err:
                                         st.error(img_err)
                                     elif img_url:
@@ -403,7 +403,7 @@ def main():
         
         if col_b.button("✨ LED 특화 키워드 발굴 시작", type="primary", use_container_width=True):
             m_type = 'gemini' if "Gemini" in ai_m else 'gpt'
-            target_key = gemini_key if m_type == 'gemini' else openai_key
+            target_key = st.session_state['gemini_key'] if m_type == 'gemini' else st.session_state['openai_key']
             
             if not target_key:
                 st.error(f"키워드 발굴을 위해 {m_type.upper()} API Key가 필요합니다. 설정 메뉴에서 입력해주세요.")

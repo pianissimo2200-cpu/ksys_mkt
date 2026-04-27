@@ -100,6 +100,10 @@ def main():
     with st.sidebar:
         st.title("⚙️ 설정")
         
+        # API 키 공통 로드 (어느 메뉴에서든 사용할 수 있도록)
+        gemini_key = os.environ.get("GEMINI_API_KEY", get_secret("GEMINI_API_KEY", ""))
+        openai_key = os.environ.get("OPENAI_API_KEY", get_secret("OPENAI_API_KEY", ""))
+        
         # 1. 수집 기간 설정
         st.markdown("##### 📅 데이터 수집 기간")
         today = datetime.date.today()
@@ -202,16 +206,14 @@ def main():
             st.markdown("블로그 본문을 분석하고 AI가 글과 이미지를 자동 생성하기 위해 설정이 필요합니다.")
             
             c1, c2 = st.columns([0.8, 0.2])
-            default_gemini = os.environ.get("GEMINI_API_KEY", get_secret("GEMINI_API_KEY", ""))
-            gemini_key = c1.text_input("Gemini API Key", type="password", value=default_gemini)
+            gemini_key = c1.text_input("Gemini API Key", type="password", value=gemini_key)
             if c2.button("Gemini 키 확인", use_container_width=True):
                 is_valid, msg = ai_utils.validate_gemini_key(gemini_key)
                 if is_valid: st.success(f"✅ {msg}")
                 else: st.error(f"❌ {msg}")
             
             c3, c4 = st.columns([0.8, 0.2])
-            default_openai = os.environ.get("OPENAI_API_KEY", get_secret("OPENAI_API_KEY", ""))
-            openai_key = c3.text_input("OpenAI API Key", type="password", value=default_openai)
+            openai_key = c3.text_input("OpenAI API Key", type="password", value=openai_key)
             if c4.button("OpenAI 키 확인", use_container_width=True):
                 is_valid, msg = ai_utils.validate_openai_key(openai_key)
                 if is_valid: st.success(f"✅ {msg}")

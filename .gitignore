@@ -1,0 +1,11 @@
+.env
+*.pyc
+__pycache__/
+.streamlit/
+google-key.json
+*.json
+!requirements.txt
+!app.py
+!ai_utils.py
+!collector_utils.py
+!auto_sync_sheets.py

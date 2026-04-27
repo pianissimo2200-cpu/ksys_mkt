@@ -25,7 +25,7 @@ def validate_openai_key(api_key):
         return False, "유효하지 않거나 권한이 없는 키입니다."
 
 def analyze_and_generate_post(content, company_positioning, api_key, model_type='gemini'):
-    """선택된 모델(Gemini 또는 GPT)을 사용하여 경쟁사 본문을 분석하고 자사 맞춤형 포스팅을 생성합니다."""
+    """선택된 모델(Gemini 또는 GPT)을 사용하여 경쟁사 본문을 분석하고 케이시스만의 벤치마킹 포인트와 포스팅을 생성합니다."""
     if not api_key:
         return f"{model_type.upper()} API 키가 입력되지 않았습니다."
         
@@ -38,19 +38,28 @@ def analyze_and_generate_post(content, company_positioning, api_key, model_type=
 [우리의 포지셔닝/강조점]
 {company_positioning}
 
-위 경쟁사 글을 먼저 분석하여, 그들이 강조하는 메인 키워드와 마케팅 소구점(Selling Point)이 무엇인지 파악하세요.
-그 후, 경쟁사의 논리를 부드럽게 반박하거나 우리 제품의 우수성({company_positioning})을 더 부각시킬 수 있는 네이버 블로그용 포스팅 초안을 작성해주세요.
-글은 서론-본론-결론이 명확하게 구분되어야 하며, 적절한 이모지와 해시태그를 포함해야 합니다. SEO(검색엔진 최적화)를 고려하여 자연스럽게 작성해주세요.
+위 경쟁사 글을 정밀 분석하여 다음 3가지 관점으로 내용을 정리하고, 우리가 이길 수 있는 새로운 포스팅 초안을 작성해주세요.
+
+1. [벤치마킹 포인트] 경쟁사 글에서 우리가 부러워할 만한 점이나 배울 점은 무엇인가? (구체적으로 2~3가지)
+2. [케이시스만의 차별화 전략] 경쟁사의 논리를 어떻게 우리만의 강점({company_positioning})으로 압도할 것인가?
+3. [실전 가이드] 경쟁사보다 더 높은 상위 노출과 클릭을 끌어내기 위한 핵심 팁
 
 결과는 다음 포맷으로 출력해주세요:
 
 ---
-## 📊 경쟁사 분석 요약
-(경쟁사 글에 대한 3줄 요약 및 분석)
+## 🎯 벤치마킹 어드바이저 리포트
+### 1. 우리가 배울 점 (Point of Envy)
+(내용 작성)
+
+### 2. 케이시스만의 필승 전략 (Ksys Advantage)
+(내용 작성)
+
+### 3. 포스팅 핵심 가이드
+(내용 작성)
 
 ---
-## 📝 자동 생성된 포스팅 초안
-(작성된 블로그 포스팅 내용)
+## 📝 케이시스 맞춤형 포스팅 초안
+(작성된 블로그 포스팅 내용 - 서론/본론/결론, 이모지, 해시태그 포함)
 """
 
     if model_type == 'gemini':
@@ -66,15 +75,56 @@ def analyze_and_generate_post(content, company_positioning, api_key, model_type=
         try:
             client = OpenAI(api_key=api_key)
             response = client.chat.completions.create(
-                model="gpt-4o", # 가장 최신 모델인 gpt-4o 사용
+                model="gpt-4o",
                 messages=[
-                    {"role": "system", "content": "너는 전문적인 블로그 마케팅 전문가이자 카피라이터야."},
+                    {"role": "system", "content": "너는 LED 전광판 전문 마케팅 컨설턴트이자 카피라이터야."},
                     {"role": "user", "content": prompt}
                 ]
             )
             return response.choices[0].message.content
         except Exception as e:
             return f"GPT 텍스트 생성 중 오류 발생: {e}"
+
+def generate_led_keywords(api_key, model_type='gemini'):
+    """LED 전광판과 관련하여 선점하기 좋은 업종별/문제해결형/트렌드 키워드와 제목을 제안합니다."""
+    if not api_key:
+        return "API 키가 필요합니다."
+        
+    prompt = """
+너는 LED 전광판 전문 마케팅 전략가야. 우리 회사(케이시스)가 네이버 블로그에서 선점하기 좋은 'LED 전광판' 관련 키워드를 발굴해서 제안해줘.
+
+다음 3가지 카테고리별로 각 3개씩, 총 9개의 키워드 세트를 제안해줘.
+
+1. [업종별 침투] LED 전광판이 필요한 특정 장소/업종 타겟 (예: 교회, 학교, 경로당 등)
+2. [문제 해결 및 정보] 고객의 고민이나 궁금증 해결 (예: 가격 비교, 유지보수, 설치 절차 등)
+3. [시즌 및 트렌드] 현재 사회 분위기나 특정 시기에 맞는 키워드
+
+각 키워드에 대해 다음을 포함해줘:
+- 추천 키워드
+- 선정 이유 (왜 지금 이 키워드를 선점해야 하는가?)
+- 추천 포스팅 제목 (사람들이 클릭하고 싶게 만드는 매력적인 제목)
+
+출력은 깔끔한 마크다운 형식으로 해줘.
+"""
+
+    if model_type == 'gemini':
+        try:
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel('gemini-1.5-flash')
+            response = model.generate_content(prompt)
+            return response.text
+        except Exception as e:
+            return f"오류 발생: {e}"
+    else:
+        try:
+            client = OpenAI(api_key=api_key)
+            response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{"role": "user", "content": prompt}]
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            return f"오류 발생: {e}"
 
 
 def generate_blog_image(topic_summary, openai_api_key):

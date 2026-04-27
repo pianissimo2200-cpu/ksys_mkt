@@ -93,7 +93,7 @@ def main():
     rank_keywords = load_rank_keywords()
     trend_keywords = load_trend_keywords()
     
-    menu_options = ["📰 네이버 주요 뉴스 스크랩 통합", "🏢 경쟁사 최신 포스팅 스크랩 통합", "🏆 네이버 상위노출 현황", "📊 키워드 검색 트렌드 분석"]
+    menu_options = ["📰 네이버 주요 뉴스 스크랩 통합", "🏢 경쟁사 최신 포스팅 스크랩 통합", "🏆 네이버 상위노출 현황", "📊 키워드 검색 트렌드 분석", "💡 LED 특화 키워드 선점 추천"]
     selected_menu = st.radio("메뉴 선택", menu_options, horizontal=True, label_visibility="collapsed")
     
     # --- 사이드바 영역 ---
@@ -389,6 +389,27 @@ def main():
                 ]).to_html(escape=False)
                 
                 st.markdown(table_html, unsafe_allow_html=True)
+
+    elif selected_menu == "💡 LED 특화 키워드 선점 추천":
+        st.subheader("💡 LED 전광판 특화 키워드 선점 전략")
+        st.markdown("""
+        이 메뉴는 AI가 **LED 전광판** 시장의 흐름을 분석하여, 현재 우리가 네이버 블로그에서 선점하면 좋은 알짜배기 키워드들을 제안해 드립니다.
+        """)
+        
+        col_m, col_b = st.columns([0.4, 0.6])
+        ai_m = col_m.radio("분석 AI 모델", ["Gemini (1.5 Flash)", "GPT (4o)"], key="kw_ai_model", horizontal=True)
+        
+        if col_b.button("✨ LED 특화 키워드 발굴 시작", type="primary", use_container_width=True):
+            m_type = 'gemini' if "Gemini" in ai_m else 'gpt'
+            target_key = gemini_key if m_type == 'gemini' else openai_key
+            
+            if not target_key:
+                st.error(f"키워드 발굴을 위해 {m_type.upper()} API Key가 필요합니다. 설정 메뉴에서 입력해주세요.")
+            else:
+                with st.spinner(f"{ai_m}가 최신 LED 시장 트렌드를 분석 중입니다..."):
+                    suggestions = ai_utils.generate_led_keywords(target_key, model_type=m_type)
+                    st.markdown(suggestions)
+                    st.download_button("💡 키워드 제안서 다운로드", data=suggestions, file_name=f"led_keyword_strategy_{m_type}.md")
 
 if __name__ == "__main__":
     main()

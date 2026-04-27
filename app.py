@@ -46,8 +46,29 @@ def fetch_naver_search_volume(keyword):
 def fetch_naver_datalab_trend(keywords, start_date, end_date, gender=None, ages=None, time_unit='month'):
     return utils.fetch_naver_datalab_trend(keywords, start_date, end_date, CLIENT_ID, CLIENT_SECRET, time_unit=time_unit, gender=gender, ages=ages)
 
+def check_password():
+    """비밀번호가 맞는지 확인합니다. 맞으면 True, 틀리면 로그인 화면을 출력합니다."""
+    def password_entered():
+        if st.session_state["password"] == st.secrets["APP_PASSWORD"]:
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]  # 보안을 위해 세션에서 비밀번호 삭제
+        else:
+            st.session_state["password_correct"] = False
+
+    if "password_correct" not in st.session_state:
+        # 로그인 화면 출력
+        st.title("🔒 케이시스 마케팅 인사이트")
+        st.text_input("접속 비밀번호를 입력하세요", type="password", on_change=password_entered, key="password")
+        if "password_correct" in st.session_state and not st.session_state["password_correct"]:
+            st.error("😕 비밀번호가 틀렸습니다.")
+        return False
+    return True
+
 def main():
     st.set_page_config(page_title="마케팅 인사이트 대시보드", page_icon="📈", layout="wide")
+    
+    if not check_password():
+        st.stop()  # 비밀번호가 틀리면 여기서 멈춤
     
     # 크롬 브라우저 자동번역 방지 스크립트
     st.components.v1.html(

@@ -122,7 +122,7 @@ def main():
     trend_keywords = load_trend_keywords()
     
     menu_options = ["📰 네이버 주요 뉴스 스크랩 통합", "🏢 경쟁사 최신 포스팅 스크랩 통합", "🏆 네이버 상위노출 현황", "📊 키워드 검색 트렌드 분석", "💡 LED 특화 키워드 선점 추천"]
-    selected_menu = st.radio("메뉴 선택", menu_options, horizontal=True, label_visibility="collapsed")
+    selected_menu = st.radio("메뉴 선택", menu_options, horizontal=True, label_visibility="collapsed", key="main_menu")
     
     # --- 사이드바 영역 ---
     with st.sidebar:

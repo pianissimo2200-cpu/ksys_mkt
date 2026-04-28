@@ -218,21 +218,27 @@ def main():
     if selected_menu == "📰 네이버 주요 뉴스 스크랩 통합":
         st.subheader("📰 뉴스 통합 브리핑")
         if st.button("뉴스 수집 시작", type="primary", use_container_width=True):
-            all_news = []
-            for kw in keywords:
-                df = fetch_naver_news(kw, start_date, end_date)
-                if not df.empty:
-                    df.insert(0, '키워드', kw)
-                    all_news.append(df)
-            if all_news:
-                st.dataframe(
-                    pd.concat(all_news), 
-                    use_container_width=True, 
-                    hide_index=True,
-                    column_config={
-                        "링크": st.column_config.LinkColumn("링크", display_text="🔗 링크 열기")
-                    }
-                )
+            if not CLIENT_ID or not CLIENT_SECRET:
+                st.error("❌ 네이버 API 키가 설정되지 않았습니다. Streamlit Secrets에 NAVER_CLIENT_ID와 NAVER_CLIENT_SECRET을 등록해 주세요.")
+            else:
+                with st.spinner("뉴스를 수집하는 중입니다..."):
+                    all_news = []
+                    for kw in keywords:
+                        df = fetch_naver_news(kw, start_date, end_date)
+                        if not df.empty:
+                            df.insert(0, '키워드', kw)
+                            all_news.append(df)
+                    if all_news:
+                        st.dataframe(
+                            pd.concat(all_news), 
+                            use_container_width=True, 
+                            hide_index=True,
+                            column_config={
+                                "링크": st.column_config.LinkColumn("링크", display_text="🔗 링크 열기")
+                            }
+                        )
+                    else:
+                        st.info("해당 기간 동안 검색된 뉴스가 없습니다.")
 
     elif selected_menu == "🏢 경쟁사 최신 포스팅 스크랩 통합":
         st.subheader("🏢 경쟁사 최신 포스팅 분석 및 AI 콘텐츠 어시스턴트")
@@ -375,27 +381,32 @@ def main():
         else:
             target_name = st.text_input("추적할 업체/브랜드명 (미입력 시 자사명)", value=COMPANY_NAME)
             if st.button("순위 추적 시작", type="primary", use_container_width=True):
-                results = []
-                for kw in rank_keywords:
-                    rank_data = fetch_naver_rank(kw, target_name)
-                    # collector_utils의 fetch_naver_rank 결과를 기반으로 노출 여부 판별
-                    is_found = 1 <= rank_data.get('rank', 999) <= 100
-                    
-                    title = rank_data.get('title', '-')
-                    link = rank_data.get('link', '-')
-                    if link != "-":
-                        title_html = f'<a href="{link}" target="_blank" style="text-decoration:none; color:#0366d6; font-weight:bold;">{title}</a>'
-                    else:
-                        title_html = title
+                if not CLIENT_ID or not CLIENT_SECRET:
+                    st.error("❌ 네이버 API 키가 설정되지 않았습니다. Streamlit Secrets 설정을 확인해 주세요.")
+                else:
+                    with st.spinner("상위노출 순위를 조회하는 중입니다..."):
+                        results = []
+                        for kw in rank_keywords:
+                            rank_data = fetch_naver_rank(kw, target_name)
+                            # collector_utils의 fetch_naver_rank 결과를 기반으로 노출 여부 판별
+                            is_found = 1 <= rank_data.get('rank', 999) <= 100
+                            
+                            title = rank_data.get('title', '-')
+                            link = rank_data.get('link', '-')
+                            if link != "-":
+                                title_html = f'<a href="{link}" target="_blank" style="text-decoration:none; color:#0366d6; font-weight:bold;">{title}</a>'
+                            else:
+                                title_html = title
+        
+                            results.append({
+                                "키워드": kw,
+                                "검색대상": target_name,
+                                "노출 여부": "✅ 노출 중" if is_found else "❌ 미노출",
+                                "순위/위치": f"{rank_data['rank']}위 (블로그)" if is_found else "-",
+                                "블로그명": rank_data.get('blogger', '-'),
+                                "제목": title_html
+                            })
 
-                    results.append({
-                        "키워드": kw,
-                        "검색대상": target_name,
-                        "노출 여부": "✅ 노출 중" if is_found else "❌ 미노출",
-                        "순위/위치": f"{rank_data['rank']}위 (블로그)" if is_found else "-",
-                        "블로그명": rank_data.get('blogger', '-'),
-                        "제목": title_html
-                    })
                 
                 df = pd.DataFrame(results)
                 

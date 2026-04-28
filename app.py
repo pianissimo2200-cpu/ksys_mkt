@@ -12,7 +12,7 @@ import ai_utils
 # 환경 변수 로드 (.env)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
-COMPANY_NAME = os.environ.get("COMPANY_NAME", "자사")
+COMPANY_NAME = os.environ.get("COMPANY_NAME", "케이시스")
 
 # 네이버 API 키 설정 (os.environ 사용)
 CLIENT_ID = os.environ.get("NAVER_CLIENT_ID", "")

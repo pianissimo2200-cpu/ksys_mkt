@@ -122,10 +122,15 @@ def get_worksheet(sheet_name):
 def load_competitors():
     ws = get_worksheet("경쟁사관리")
     if ws:
-        rows = ws.get_all_records()
-        if rows:
-            return [{"name": r["업체명"], "url": r["블로그URL"]} for r in rows if r["업체명"] and r["블로그URL"]]
+        try:
+            rows = ws.get_all_records()
+            if rows:
+                return [{"name": str(r.get("업체명", "")), "url": str(r.get("블로그URL", ""))} for r in rows if r.get("업체명") and r.get("블로그URL")]
+            return [] # 시트가 존재하지만 비어있는 경우
+        except Exception as e:
+            print(f"구글 시트 로드 실패 (경쟁사): {e}")
     
+    # 시트 연동 실패 시 로컬 파일 fallback
     if os.path.exists(COMPETITORS_FILE):
         try:
             with open(COMPETITORS_FILE, 'r', encoding='utf-8') as f:
@@ -187,6 +192,18 @@ def load_trend_keywords():
 
 def save_trend_keywords(data):
     save_keywords_generic("트렌드키워드관리", TREND_KEYWORDS_FILE, data)
+
+def check_gsheet_connection():
+    """구글 시트 연동 상태를 확인합니다."""
+    try:
+        client = get_gspread_client()
+        if not client: return False
+        sheet_id = os.environ.get("GOOGLE_SHEET_ID")
+        if not sheet_id: return False
+        client.open_by_key(sheet_id)
+        return True
+    except:
+        return False
 
 def extract_naver_blog_id(url):
     match = re.search(r'blog\.naver\.com/([^/?]+)', url)

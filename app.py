@@ -179,6 +179,17 @@ def main():
                     save_competitors(competitors)
                     st.rerun()
 
+        st.divider()
+        # 구글 시트 연동 상태 표시
+        if utils.check_gsheet_connection():
+            st.success("✅ 구글 시트 연동 중")
+            st.caption("데이터가 실시간으로 영구 저장됩니다.")
+        else:
+            st.error("❌ 구글 시트 연결 실패")
+            st.caption("로컬 모드: 재접속 시 데이터 유실 위험")
+            if st.button("새로고침/재시도"):
+                st.rerun()
+
     # ===== 메뉴별 화면 렌더링 =====
     if selected_menu == "📰 네이버 주요 뉴스 스크랩 통합":
         st.subheader("📰 뉴스 통합 브리핑")

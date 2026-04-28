@@ -153,9 +153,13 @@ def save_competitors(data):
 def load_keywords_generic(sheet_name, file_path, default_list):
     ws = get_worksheet(sheet_name)
     if ws:
-        values = ws.get_all_values()
-        if len(values) > 1:
-            return [row[0] for row in values[1:] if row[0]]
+        try:
+            values = ws.get_all_values()
+            if len(values) > 1:
+                return [row[0] for row in values[1:] if row[0]]
+            return [] # 시트가 비어있는 경우
+        except Exception as e:
+            print(f"구글 시트 로드 실패 ({sheet_name}): {e}")
             
     if os.path.exists(file_path):
         try:

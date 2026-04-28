@@ -21,15 +21,39 @@ SA_API_KEY = os.environ.get("SA_API_KEY", "")
 SA_SECRET_KEY = os.environ.get("SA_SECRET_KEY", "")
 SA_CUSTOMER_ID = os.environ.get("SA_CUSTOMER_ID", "")
 
-# 유틸리티 함수 래핑
-load_competitors = utils.load_competitors
-save_competitors = utils.save_competitors
-load_keywords = utils.load_keywords
-save_keywords = utils.save_keywords
-load_rank_keywords = utils.load_rank_keywords
-save_rank_keywords = utils.save_rank_keywords
-load_trend_keywords = utils.load_trend_keywords
-save_trend_keywords = utils.save_trend_keywords
+# 유틸리티 함수 래핑 및 캐싱 (API 한도 초과 방지 및 속도 향상)
+@st.cache_data(ttl=600, show_spinner=False)
+def load_competitors():
+    return utils.load_competitors()
+
+def save_competitors(data):
+    utils.save_competitors(data)
+    load_competitors.clear()
+
+@st.cache_data(ttl=600, show_spinner=False)
+def load_keywords():
+    return utils.load_keywords()
+
+def save_keywords(data):
+    utils.save_keywords(data)
+    load_keywords.clear()
+
+@st.cache_data(ttl=600, show_spinner=False)
+def load_rank_keywords():
+    return utils.load_rank_keywords()
+
+def save_rank_keywords(data):
+    utils.save_rank_keywords(data)
+    load_rank_keywords.clear()
+
+@st.cache_data(ttl=600, show_spinner=False)
+def load_trend_keywords():
+    return utils.load_trend_keywords()
+
+def save_trend_keywords(data):
+    utils.save_trend_keywords(data)
+    load_trend_keywords.clear()
+
 fetch_blog_feed = utils.fetch_blog_feed
 
 def fetch_naver_news(query, start_date, end_date):

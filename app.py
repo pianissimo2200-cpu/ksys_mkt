@@ -20,8 +20,8 @@ def inject_custom_css():
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif !important;
         }
         
-        /* 스트림릿 기본 요소 대비 강화 */
-        .stMarkdown p, .stMetric div, .stRadio label {
+        /* 스트림릿 기본 요소 대비 강화 및 텍스트 강제 고정 */
+        .stMarkdown p, .stMarkdown div, .stMarkdown span, .stMetric div, .stRadio label {
             color: #191F28 !important;
         }
 
@@ -57,9 +57,9 @@ def inject_custom_css():
             margin-bottom: 2rem !important;
         }
 
-        /* 버튼 스타일 (기본은 블루, 단 사이드바 삭제 버튼 등은 제외하기 위해 더 구체적으로 지정) */
+        /* 버튼 스타일 (미니멀 & 직관적) */
         div[data-testid="stAppViewContainer"] .stButton>button[kind="primary"] {
-            background-color: #0064FF !important;
+            background-color: #3182F6 !important; /* 토스 블루 */
             color: white !important;
             border-radius: 12px !important;
             border: none !important;
@@ -70,8 +70,8 @@ def inject_custom_css():
             box-shadow: 0 4px 12px rgba(0, 100, 255, 0.1);
         }
         div[data-testid="stAppViewContainer"] .stButton>button[kind="primary"]:hover {
-            background-color: #0052D1 !important;
-            box-shadow: 0 6px 16px rgba(0, 100, 255, 0.2) !important;
+            background-color: #1B64DA !important;
+            box-shadow: 0 4px 12px rgba(49, 130, 246, 0.2) !important;
             transform: translateY(-1px);
         }
         
@@ -451,17 +451,17 @@ def main():
     trend_keywords = sort_by_fav(load_trend_keywords())
     
     # --- 메인 화면 상단 ---
-    st.markdown("# 📈 마케팅 인사이트 대시보드")
+    st.markdown("# 마케팅 인사이트 대시보드")
     
-    menu_options = ["📰 네이버 주요 뉴스 스크랩 통합", "🏢 경쟁사 최신 포스팅 스크랩 통합", "🏆 네이버 상위노출 현황", "📊 키워드 검색 트렌드 분석", "💡 LED 특화 키워드 선점 추천"]
+    menu_options = ["뉴스 통합 브리핑", "경쟁사 포스팅 분석", "네이버 상위노출 추적", "검색 트렌드 분석", "키워드 선점 추천"]
     selected_menu = st.radio("메뉴 선택", menu_options, horizontal=True, label_visibility="collapsed", key="main_menu_v3")
     
     # --- 사이드바 영역 (미니멀 & 점진적 노출) ---
     with st.sidebar:
-        st.markdown("# ⚙️ 설정")
+        st.markdown("# 설정")
         
         # 1. 수집 기간 설정
-        st.markdown("### 📅 수집 기간")
+        st.markdown("### 수집 기간")
         today = datetime.date.today()
         one_week_ago = today - datetime.timedelta(days=7)
         date_range = st.date_input("조회 기간", value=(one_week_ago, today), max_value=today, label_visibility="collapsed")
@@ -533,10 +533,10 @@ def main():
                         save_func(kws)
                         st.rerun()
 
-        if selected_menu == "📰 네이버 주요 뉴스 스크랩 통합":
+        if selected_menu == "뉴스 통합 브리핑":
             render_keyword_management("🔑 뉴스 키워드 관리", keywords, save_keywords, "nw")
 
-        elif selected_menu == "🏢 경쟁사 최신 포스팅 스크랩 통합":
+        elif selected_menu == "경쟁사 포스팅 분석":
             with st.expander("🏢 경쟁사 블로그 관리", expanded=True):
                 new_name = st.text_input("업체명", key="add_comp")
                 new_url = st.text_input("블로그URL", key="add_comp_url")
@@ -580,11 +580,11 @@ def main():
                         save_competitors(competitors)
                         st.rerun()
 
-        elif selected_menu == "🏆 네이버 상위노출 현황":
-            render_keyword_management("🏆 상위노출 키워드 관리", rank_keywords, save_rank_keywords, "rk")
+        elif selected_menu == "네이버 상위노출 추적":
+            render_keyword_management("상위노출 키워드 관리", rank_keywords, save_rank_keywords, "rk")
 
-        elif selected_menu == "📊 트렌드 키워드 관리":
-            render_keyword_management("📊 트렌드 키워드 관리", trend_keywords, save_trend_keywords, "tk")
+        elif selected_menu == "검색 트렌드 분석":
+            render_keyword_management("트렌드 키워드 관리", trend_keywords, save_trend_keywords, "tk")
 
         st.divider()
         # 구글 시트 연동 상태 표시
@@ -605,9 +605,9 @@ def main():
     st.markdown("<br>", unsafe_allow_html=True)
 
     # ===== 메뉴별 화면 렌더링 =====
-    if selected_menu == "📰 네이버 주요 뉴스 스크랩 통합":
+    if selected_menu == "뉴스 통합 브리핑":
         st.markdown('<div class="content-card">', unsafe_allow_html=True)
-        st.subheader("📰 뉴스 통합 브리핑")
+        st.subheader("뉴스 통합 브리핑")
         if st.button("뉴스 수집 시작", type="primary", use_container_width=True, key="news_fetch_btn"):
             if not CLIENT_ID or not CLIENT_SECRET:
                 st.error("❌ 네이버 API 키가 설정되지 않았습니다. Streamlit Secrets에 NAVER_CLIENT_ID와 NAVER_CLIENT_SECRET을 등록해 주세요.")
@@ -646,12 +646,12 @@ def main():
             st.components.v1.html(html_content, height=calc_height, scrolling=False)
         st.markdown('</div>', unsafe_allow_html=True)
 
-    elif selected_menu == "🏢 경쟁사 최신 포스팅 스크랩 통합":
+    elif selected_menu == "경쟁사 포스팅 분석":
         st.markdown('<div class="content-card">', unsafe_allow_html=True)
-        st.subheader("🏢 경쟁사 최신 포스팅 분석 및 AI 콘텐츠 어시스턴트")
+        st.subheader("경쟁사 최신 포스팅 분석 및 AI 콘텐츠 어시스턴트")
         
-        with st.expander("⚙️ AI 생성 설정 (API 키 및 자사 정보)", expanded=False):
-            st.markdown("블로그 본문을 분석하고 AI가 글과 이미지를 자동 생성하기 위해 설정이 필요합니다.")
+        with st.expander("AI 콘텐츠 생성 설정 (API 키 및 자사 정보)", expanded=False):
+            st.markdown("경쟁사 블로그 본문을 분석하고 AI가 글과 이미지를 자동 생성하기 위해 설정이 필요합니다.")
             
             c1, c2 = st.columns([0.8, 0.2])
             st.session_state['gemini_key'] = c1.text_input("Gemini API Key", type="password", value=st.session_state['gemini_key'])
@@ -760,7 +760,7 @@ def main():
                                         st.markdown(f"[🔗 이미지 원본 다운로드]({img_url})")
         st.markdown('</div>', unsafe_allow_html=True)
 
-    elif selected_menu == "📊 키워드 검색 트렌드 분석":
+    elif selected_menu == "검색 트렌드 분석":
         st.markdown('<div class="content-card">', unsafe_allow_html=True)
         st.subheader("📊 키워드 검색 트렌드 분석")
         if not trend_keywords:
@@ -860,7 +860,7 @@ def main():
                 st.components.v1.html(html_content, height=calc_height, scrolling=False)
         st.markdown('</div>', unsafe_allow_html=True)
 
-    elif selected_menu == "💡 LED 특화 키워드 선점 추천":
+    elif selected_menu == "키워드 선점 추천":
         st.markdown('<div class="content-card">', unsafe_allow_html=True)
         st.subheader("💡 LED 전광판 특화 키워드 선점 전략")
         st.markdown("""

@@ -16,8 +16,14 @@ def inject_custom_css():
         /* Pretendard 폰트 로드 */
         @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
         
-        html, body, [class*="css"], .stMarkdown, p, div {
+        html, body, [class*="css"], .stMarkdown, p, div, span {
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif !important;
+            color: #191F28; /* 기본 텍스트 색상 명시 */
+        }
+        
+        /* 스트림릿 기본 요소 대비 강화 */
+        .stMarkdown p, .stMetric div, .stRadio label {
+            color: #191F28 !important;
         }
 
         /* 배경색 설정 */
@@ -192,6 +198,22 @@ def inject_custom_css():
             text-decoration: underline !important;
         }
 
+        /* 메트릭(KPI) 대비 강화 */
+        [data-testid="stMetricValue"] div {
+            color: #191F28 !important;
+            font-weight: 700 !important;
+        }
+        [data-testid="stMetricLabel"] p {
+            color: #4E5968 !important;
+            font-weight: 500 !important;
+        }
+
+        /* 라디오 버튼(메뉴) 대비 강화 */
+        div[data-testid="stRadio"] label p {
+            color: #191F28 !important;
+            font-weight: 500 !important;
+        }
+
         /* 메트릭(KPI) 스타일 */
         [data-testid="stMetric"] {
             background-color: white;
@@ -308,7 +330,6 @@ def check_password():
             st.session_state["password_correct"] = False
 
     if "password_correct" not in st.session_state:
-        inject_custom_css()
         # 로그인 화면 중앙 정렬을 위한 컬럼 배치
         _, col, _ = st.columns([1, 1.2, 1])
         with col:

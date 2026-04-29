@@ -125,8 +125,15 @@ def load_competitors():
         try:
             rows = ws.get_all_records()
             if rows:
-                return [{"name": str(r.get("업체명", "")), "url": str(r.get("블로그URL", ""))} for r in rows if r.get("업체명") and r.get("블로그URL")]
-            return [] # 시트가 존재하지만 비어있는 경우
+                return [
+                    {
+                        "name": str(r.get("업체명", "")), 
+                        "url": str(r.get("블로그URL", "")),
+                        "fav": bool(r.get("즐겨찾기", False))
+                    } 
+                    for r in rows if r.get("업체명") and r.get("블로그URL")
+                ]
+            # 시트가 비어있으면 로컬 파일로 진행 (fallback)
         except Exception as e:
             print(f"구글 시트 로드 실패 (경쟁사): {e}")
     
@@ -142,9 +149,9 @@ def save_competitors(data):
     ws = get_worksheet("경쟁사관리")
     if ws:
         ws.clear()
-        ws.append_row(["업체명", "블로그URL"])
+        ws.append_row(["업체명", "블로그URL", "즐겨찾기"])
         if data:
-            rows = [[d["name"], d["url"]] for d in data]
+            rows = [[d["name"], d["url"], d.get("fav", False)] for d in data]
             ws.append_rows(rows)
     
     with open(COMPETITORS_FILE, 'w', encoding='utf-8') as f:
@@ -154,10 +161,10 @@ def load_keywords_generic(sheet_name, file_path, default_list):
     ws = get_worksheet(sheet_name)
     if ws:
         try:
-            values = ws.get_all_values()
-            if len(values) > 1:
-                return [row[0] for row in values[1:] if row[0]]
-            return [] # 시트가 비어있는 경우
+            rows = ws.get_all_records()
+            if rows:
+                return [{"name": str(r.get("키워드", "")), "fav": bool(r.get("즐겨찾기", False))} for r in rows if r.get("키워드")]
+            # 시트가 비어있으면 로컬 파일로 진행 (fallback)
         except Exception as e:
             print(f"구글 시트 로드 실패 ({sheet_name}): {e}")
             
@@ -172,9 +179,16 @@ def save_keywords_generic(sheet_name, file_path, data):
     ws = get_worksheet(sheet_name)
     if ws:
         ws.clear()
-        ws.append_row(["키워드"])
+        ws.append_row(["키워드", "즐겨찾기"])
         if data:
-            ws.append_rows([[d] for d in data])
+            # data가 문자열 리스트인 경우를 대비한 변환
+            processed_data = []
+            for d in data:
+                if isinstance(d, dict):
+                    processed_data.append([d.get("name", ""), d.get("fav", False)])
+                else:
+                    processed_data.append([str(d), False])
+            ws.append_rows(processed_data)
             
     with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)

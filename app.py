@@ -9,6 +9,224 @@ from dotenv import load_dotenv
 import collector_utils as utils
 import ai_utils
 
+# --- 커스텀 스타일 정의 (Toss/Apple Style) ---
+def inject_custom_css():
+    st.markdown("""
+        <style>
+        /* Pretendard 폰트 로드 */
+        @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
+        
+        html, body, [class*="css"], .stMarkdown, p, div {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif !important;
+        }
+
+        /* 배경색 설정 */
+        .stApp {
+            background-color: #F2F4F7;
+        }
+
+        /* 카드 스타일 */
+        .content-card {
+            background-color: #FFFFFF;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            margin-bottom: 1.5rem;
+        }
+
+        /* 제목 스타일 */
+        h1, h2, h3 {
+            color: #191F28 !important;
+            font-weight: 700 !important;
+            letter-spacing: -0.02em !important;
+        }
+
+        /* 사이드바 스타일 */
+        section[data-testid="stSidebar"] {
+            background-color: #FFFFFF !important;
+            border-right: 1px solid #E5E8EB !important;
+        }
+        
+        section[data-testid="stSidebar"] .stMarkdown h1 {
+            font-size: 1.5rem !important;
+            margin-bottom: 2rem !important;
+        }
+
+        /* 버튼 스타일 (기본은 블루, 단 사이드바 삭제 버튼 등은 제외하기 위해 더 구체적으로 지정) */
+        div[data-testid="stAppViewContainer"] .stButton>button[kind="primary"] {
+            background-color: #0064FF !important;
+            color: white !important;
+            border-radius: 12px !important;
+            border: none !important;
+            padding: 0.6rem 1.5rem !important;
+            font-weight: 600 !important;
+            width: 100%;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 100, 255, 0.1);
+        }
+        div[data-testid="stAppViewContainer"] .stButton>button[kind="primary"]:hover {
+            background-color: #0052D1 !important;
+            box-shadow: 0 6px 16px rgba(0, 100, 255, 0.2) !important;
+            transform: translateY(-1px);
+        }
+        
+        /* 입력창 스타일 */
+        .stTextInput>div>div>input {
+            border-radius: 10px !important;
+            border: 1px solid #E5E8EB !important;
+            padding: 0.8rem 1rem !important;
+        }
+
+        /* 탭 스타일 */
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 10px;
+            background-color: transparent;
+        }
+        .stTabs [data-baseweb="tab"] {
+            height: 45px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 0 20px;
+            border: 1px solid #E5E8EB;
+            font-weight: 500;
+        }
+        .stTabs [aria-selected="true"] {
+            background-color: #0064FF !important;
+            color: white !important;
+            border: 1px solid #0064FF !important;
+        }
+
+        /* 키워드 관리 행 스타일 (간격 축소 및 Hover 효과) */
+        .keyword-row {
+            display: flex;
+            align-items: center;
+            padding: 2px 8px;
+            margin: 2px 0;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        .keyword-row:hover {
+            background-color: #F2F4F7;
+        }
+        
+        /* 삭제 버튼 및 즐겨찾기 버튼 공통 스타일 */
+        section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"] button {
+            opacity: 0 !important;
+            width: 22px !important;
+            height: 22px !important;
+            min-height: 22px !important;
+            padding: 0 !important;
+            border-radius: 50% !important;
+            background-color: transparent !important;
+            color: transparent !important;
+            border: none !important;
+            font-size: 12px !important;
+            transition: all 0.2s ease !important;
+            box-shadow: none !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        
+        /* 키워드 행에 마우스 올렸을 때 버튼들 노출 */
+        section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"]:hover button {
+            opacity: 1 !important;
+            background-color: #F2F4F7 !important;
+            color: #8B95A1 !important;
+        }
+        
+        /* 삭제 버튼 전용 (두 번째 버튼) 호버 시 빨간색 */
+        section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"] div:nth-child(3) button:hover {
+            background-color: #FF4B4B !important;
+            color: white !important;
+        }
+
+        /* 즐겨찾기 버튼 전용 (첫 번째 버튼) 호버 시 노란색 */
+        section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"] div:nth-child(2) button:hover {
+            background-color: #FFD400 !important;
+            color: #191F28 !important;
+        }
+
+        /* 즐겨찾기 버튼이 활성화된 경우(노란색 별표) 시각적 피드백 강화 */
+        section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"] button[aria-label="★"] {
+            opacity: 1 !important;
+            color: #FFD400 !important;
+        }
+
+        /* 테이블 내부 스크롤 제거를 위한 스타일 */
+        .modern-table-container {
+            width: 100%;
+            overflow-x: visible !important;
+            overflow-y: visible !important;
+        }
+        .modern-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 10px;
+            border-radius: 12px;
+            border: 1px solid #F2F4F7;
+        }
+        .modern-table th {
+            background-color: #F9FAFB;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #4E5968;
+            border-bottom: 1px solid #F2F4F7;
+        }
+        .modern-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #F2F4F7;
+            color: #191F28;
+            vertical-align: middle;
+            font-size: 14px;
+        }
+        .modern-table td a {
+            color: #191F28;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .modern-table td a:hover {
+            color: #0064FF !important;
+            text-decoration: underline !important;
+        }
+
+        /* 메트릭(KPI) 스타일 */
+        [data-testid="stMetric"] {
+            background-color: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            border: 1px solid #F2F4F7;
+        }
+        
+        /* 배지 스타일 */
+        .badge {
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        .badge-green { background-color: #E6F4F1 !important; color: #008485 !important; }
+        .badge-red { background-color: #FEEBEB !important; color: #E91E63 !important; }
+        .badge-yellow { background-color: #FFF8E1 !important; color: #FF8F00 !important; }
+
+        /* 비밀번호 컨테이너 */
+        .login-box {
+            max-width: 450px;
+            margin: 100px auto;
+            padding: 50px;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
 # 환경 변수 로드 (.env)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
@@ -90,157 +308,268 @@ def check_password():
             st.session_state["password_correct"] = False
 
     if "password_correct" not in st.session_state:
-        # 로그인 화면 출력
-        st.title("🔒 케이시스 마케팅 인사이트")
-        st.text_input("접속 비밀번호를 입력하세요", type="password", on_change=password_entered, key="password")
-        if "password_correct" in st.session_state and not st.session_state["password_correct"]:
-            st.error("😕 비밀번호가 틀렸습니다.")
+        inject_custom_css()
+        # 로그인 화면 중앙 정렬을 위한 컬럼 배치
+        _, col, _ = st.columns([1, 1.2, 1])
+        with col:
+            st.markdown("<br><br><br>", unsafe_allow_html=True)
+            # 카드 느낌을 주기 위한 컨테이너 스타일링
+            st.markdown("""
+                <div style='text-align: center; padding: 40px; background: white; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.05);'>
+                    <h1 style='font-size: 50px; margin-bottom: 10px;'>📈</h1>
+                    <h2 style='color: #191F28; margin-bottom: 30px;'>마케팅 인사이트</h2>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            # 입력창 (위 카드 바로 아래에 배치)
+            password = st.text_input("비밀번호", type="password", key="password_input", placeholder="접속 비밀번호를 입력하세요", label_visibility="collapsed")
+            if st.button("로그인", use_container_width=True, type="primary"):
+                correct_password = get_secret("APP_PASSWORD", "ksys1234")
+                if password == correct_password:
+                    st.session_state["password_correct"] = True
+                    st.rerun()
+                else:
+                    st.error("😕 비밀번호가 틀렸습니다.")
+            
+            st.markdown('<p style="text-align: center; color: #8B95A1; font-size: 14px; margin-top: 30px;">© 2026 KSYS Marketing Team</p>', unsafe_allow_html=True)
         return False
     return True
 
 def main():
     st.set_page_config(page_title="마케팅 인사이트 대시보드", page_icon="📈", layout="wide")
     
+    if not check_password():
+        st.stop()
+        
+    inject_custom_css()
+    
     # API 키 초기 로드 (함수 최상단에서 선언하여 에러 방지)
     st.session_state['gemini_key'] = os.environ.get("GEMINI_API_KEY", get_secret("GEMINI_API_KEY", ""))
     st.session_state['openai_key'] = os.environ.get("OPENAI_API_KEY", get_secret("OPENAI_API_KEY", ""))
-    
-    if not check_password():
-        st.stop()  # 비밀번호가 틀리면 여기서 멈춤
-    
+
     # 크롬 브라우저 자동번역 방지 스크립트
     st.components.v1.html(
         """<script>window.parent.document.documentElement.lang = 'ko';window.parent.document.body.setAttribute('translate', 'no');</script>""",
         height=0, width=0
     )
     
-    st.title("📈 마케팅 인사이트 대시보드")
+    # 데이터 로드 및 즐겨찾기 기반 정렬
+    def sort_by_fav(items):
+        if not items: return []
+        # 문자열 리스트인 경우와 딕셔너리 리스트인 경우 모두 대응
+        def get_sort_key(x):
+            is_fav = x.get('fav', False) if isinstance(x, dict) else False
+            name = x.get('name', str(x)) if isinstance(x, dict) else str(x)
+            return (not is_fav, name)
+        
+        return sorted(items, key=get_sort_key)
+
+    competitors = sort_by_fav(load_competitors())
+    keywords = sort_by_fav(load_keywords())
+    rank_keywords = sort_by_fav(load_rank_keywords())
+    trend_keywords = sort_by_fav(load_trend_keywords())
     
-    competitors = load_competitors()
-    keywords = load_keywords()
-    rank_keywords = load_rank_keywords()
-    trend_keywords = load_trend_keywords()
+    # --- 메인 화면 상단 ---
+    st.markdown("# 📈 마케팅 인사이트 대시보드")
     
     menu_options = ["📰 네이버 주요 뉴스 스크랩 통합", "🏢 경쟁사 최신 포스팅 스크랩 통합", "🏆 네이버 상위노출 현황", "📊 키워드 검색 트렌드 분석", "💡 LED 특화 키워드 선점 추천"]
-    selected_menu = st.radio("메뉴 선택", menu_options, horizontal=True, label_visibility="collapsed", key="main_menu")
+    selected_menu = st.radio("메뉴 선택", menu_options, horizontal=True, label_visibility="collapsed", key="main_menu_v3")
     
-    # --- 사이드바 영역 ---
+    # --- 사이드바 영역 (미니멀 & 점진적 노출) ---
     with st.sidebar:
-        st.title("⚙️ 설정")
+        st.markdown("# ⚙️ 설정")
         
         # 1. 수집 기간 설정
-        st.markdown("##### 📅 데이터 수집 기간")
+        st.markdown("### 📅 수집 기간")
         today = datetime.date.today()
         one_week_ago = today - datetime.timedelta(days=7)
-        date_range = st.date_input("조회 기간", value=(one_week_ago, today), max_value=today)
+        date_range = st.date_input("조회 기간", value=(one_week_ago, today), max_value=today, label_visibility="collapsed")
         if isinstance(date_range, tuple) and len(date_range) == 2:
             start_date, end_date = date_range[0], date_range[1]
         else:
             start_date, end_date = today, today
 
-        # 2. 뉴스 키워드 관리
-        with st.expander("🔑 뉴스 수집 키워드 관리", expanded=(selected_menu == "📰 네이버 주요 뉴스 스크랩 통합")):
-            new_kw = st.text_input("뉴스 키워드 추가")
-            if st.button("뉴스 키워드 저장"):
-                if new_kw and new_kw not in keywords:
-                    keywords.append(new_kw)
-                    save_keywords(keywords)
-                    st.rerun()
-            for i, kw in enumerate(keywords):
-                col1, col2 = st.columns([0.8, 0.2])
-                col1.write(f"• {kw}")
-                if col2.button("X", key=f"del_nw_{i}"):
-                    keywords.pop(i)
-                    save_keywords(keywords)
-                    st.rerun()
+        st.divider()
+        
+        # 메뉴에 따른 키워드 관리 노출 (점진적 정보 공개)
+        # 메뉴에 따른 키워드 관리 노출 (점진적 정보 공개)
+        def render_keyword_management(title, kws, save_func, key_prefix):
+            with st.expander(title, expanded=True):
+                new_k = st.text_input(f"{title} 추가", key=f"add_{key_prefix}")
+                if st.button(f"{title} 저장", type="primary", use_container_width=True, key=f"save_{key_prefix}"):
+                    if new_k:
+                        # 중복 체크 (문자열 리스트와의 호환성 고려)
+                        exists = any((k['name'] if isinstance(k, dict) else k) == new_k for k in kws)
+                        if not exists:
+                            kws.append({"name": new_k, "fav": False})
+                            save_func(kws)
+                            st.rerun()
 
-        # 3. 트렌드 키워드 관리
-        with st.expander("📊 트렌드 분석 키워드 관리", expanded=(selected_menu == "📊 키워드 검색 트렌드 분석")):
-            new_tk = st.text_input("트렌드 키워드 추가")
-            if st.button("트렌드 키워드 저장"):
-                if new_tk and new_tk not in trend_keywords:
-                    trend_keywords.append(new_tk)
-                    save_trend_keywords(trend_keywords)
-                    st.rerun()
-            for i, tk in enumerate(trend_keywords):
-                col1, col2 = st.columns([0.8, 0.2])
-                col1.write(f"• {tk}")
-                if col2.button("X", key=f"del_tk_{i}"):
-                    trend_keywords.pop(i)
-                    save_trend_keywords(trend_keywords)
-                    st.rerun()
+                # 키워드 데이터 구조 정규화 (문자열 -> 딕셔너리) 및 정렬
+                # 정렬 기준: 1. 즐겨찾기(True가 위로), 2. 이름순
+                normalized_kws = []
+                for k in kws:
+                    if isinstance(k, dict):
+                        normalized_kws.append(k)
+                    else:
+                        normalized_kws.append({"name": str(k), "fav": False})
+                
+                sorted_kws = sorted(
+                    normalized_kws, 
+                    key=lambda x: (not x.get('fav', False), x.get('name', ''))
+                )
 
-        # 4. 상위노출 키워드 관리
-        with st.expander("🏆 상위노출 키워드 관리", expanded=(selected_menu == "🏆 네이버 상위노출 현황")):
-            new_rk = st.text_input("상위노출 키워드 추가")
-            if st.button("상위노출 키워드 저장"):
-                if new_rk and new_rk not in rank_keywords:
-                    rank_keywords.append(new_rk)
-                    save_rank_keywords(rank_keywords)
-                    st.rerun()
-            for i, rk in enumerate(rank_keywords):
-                col1, col2 = st.columns([0.8, 0.2])
-                col1.write(f"• {rk}")
-                if col2.button("X", key=f"del_rk_{i}"):
-                    rank_keywords.pop(i)
-                    save_rank_keywords(rank_keywords)
-                    st.rerun()
+                for i, k in enumerate(sorted_kws):
+                    name = k['name']
+                    is_fav = k.get('fav', False)
+                    
+                    c1, c2, c3 = st.columns([0.7, 0.15, 0.15])
+                    c1.markdown(f"<div style='padding: 2px 0; font-size: 14px;'>• {name}</div>", unsafe_allow_html=True)
+                    
+                    # 즐겨찾기 버튼
+                    fav_icon = "★" if is_fav else "☆"
+                    if c2.button(fav_icon, key=f"fav_{key_prefix}_{i}", help="즐겨찾기 등록/해제"):
+                        # 원본 리스트에서 해당 키워드 찾아 상태 반전
+                        for orig_k in kws:
+                            if isinstance(orig_k, dict) and orig_k['name'] == name:
+                                orig_k['fav'] = not orig_k.get('fav', False)
+                                break
+                            elif not isinstance(orig_k, dict) and str(orig_k) == name:
+                                # 문자열인 경우 찾아서 딕셔너리로 교체
+                                idx = kws.index(orig_k)
+                                kws[idx] = {"name": name, "fav": True}
+                                break
+                        save_func(kws)
+                        st.rerun()
+                    
+                    # 삭제 버튼
+                    if c3.button("X", key=f"del_{key_prefix}_{i}", help="삭제"):
+                        # 원본 리스트에서 삭제
+                        for orig_k in kws:
+                            if (isinstance(orig_k, dict) and orig_k['name'] == name) or (not isinstance(orig_k, dict) and str(orig_k) == name):
+                                kws.remove(orig_k)
+                                break
+                        save_func(kws)
+                        st.rerun()
 
-        # 5. 경쟁사 관리
-        with st.expander("🏢 경쟁사 블로그 관리", expanded=(selected_menu == "🏢 경쟁사 최신 포스팅 스크랩 통합")):
-            new_name = st.text_input("업체명")
-            new_url = st.text_input("블로그URL")
-            if st.button("경쟁사 등록"):
-                if new_name and new_url:
-                    competitors.append({"name": new_name, "url": new_url})
-                    save_competitors(competitors)
-                    st.rerun()
-            for i, comp in enumerate(competitors):
-                col1, col2 = st.columns([0.8, 0.2])
-                col1.write(f"• {comp['name']}")
-                if col2.button("X", key=f"del_comp_{i}"):
-                    competitors.pop(i)
-                    save_competitors(competitors)
-                    st.rerun()
+        if selected_menu == "📰 네이버 주요 뉴스 스크랩 통합":
+            render_keyword_management("🔑 뉴스 키워드 관리", keywords, save_keywords, "nw")
+
+        elif selected_menu == "🏢 경쟁사 최신 포스팅 스크랩 통합":
+            with st.expander("🏢 경쟁사 블로그 관리", expanded=True):
+                new_name = st.text_input("업체명", key="add_comp")
+                new_url = st.text_input("블로그URL", key="add_comp_url")
+                if st.button("경쟁사 등록", type="primary", use_container_width=True, key="save_comp"):
+                    if new_name and new_url:
+                        # 중복 체크
+                        if not any(c['url'] == new_url for c in competitors):
+                            competitors.append({"name": new_name, "url": new_url, "fav": False})
+                            save_competitors(competitors)
+                            st.rerun()
+                
+                # 경쟁사 정렬 (즐겨찾기 우선)
+                sorted_comps = sorted(
+                    competitors,
+                    key=lambda x: (not x.get('fav', False), x.get('name', ''))
+                )
+
+                for i, comp in enumerate(sorted_comps):
+                    name = comp['name']
+                    is_fav = comp.get('fav', False)
+                    
+                    c1, c2, c3 = st.columns([0.7, 0.15, 0.15])
+                    c1.markdown(f"<div style='padding: 2px 0; font-size: 14px;'>• {name}</div>", unsafe_allow_html=True)
+                    
+                    # 즐겨찾기 버튼
+                    fav_icon = "★" if is_fav else "☆"
+                    if c2.button(fav_icon, key=f"fav_comp_{i}", help="즐겨찾기"):
+                        for orig_c in competitors:
+                            if orig_c['url'] == comp['url']:
+                                orig_c['fav'] = not orig_c.get('fav', False)
+                                break
+                        save_competitors(competitors)
+                        st.rerun()
+                    
+                    # 삭제 버튼
+                    if c3.button("X", key=f"del_comp_v2_{i}", help="삭제"):
+                        for orig_c in competitors:
+                            if orig_c['url'] == comp['url']:
+                                competitors.remove(orig_c)
+                                break
+                        save_competitors(competitors)
+                        st.rerun()
+
+        elif selected_menu == "🏆 네이버 상위노출 현황":
+            render_keyword_management("🏆 상위노출 키워드 관리", rank_keywords, save_rank_keywords, "rk")
+
+        elif selected_menu == "📊 트렌드 키워드 관리":
+            render_keyword_management("📊 트렌드 키워드 관리", trend_keywords, save_trend_keywords, "tk")
 
         st.divider()
         # 구글 시트 연동 상태 표시
         if utils.check_gsheet_connection():
             st.success("✅ 구글 시트 연동 중")
-            st.caption("데이터가 실시간으로 영구 저장됩니다.")
         else:
             st.error("❌ 구글 시트 연결 실패")
-            st.caption("로컬 모드: 재접속 시 데이터 유실 위험")
-            if st.button("새로고침/재시도"):
+            if st.button("재시도"):
                 st.rerun()
+
+    # --- 상단 요약 지표 (Summary Metrics) ---
+    st.markdown("<br>", unsafe_allow_html=True)
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("뉴스 키워드", f"{len(keywords)}개")
+    m2.metric("경쟁사 블로그", f"{len(competitors)}개")
+    m3.metric("상위노출 추적", f"{len(rank_keywords)}개")
+    m4.metric("수집 기간", f"{(end_date - start_date).days}일")
+    st.markdown("<br>", unsafe_allow_html=True)
 
     # ===== 메뉴별 화면 렌더링 =====
     if selected_menu == "📰 네이버 주요 뉴스 스크랩 통합":
+        st.markdown('<div class="content-card">', unsafe_allow_html=True)
         st.subheader("📰 뉴스 통합 브리핑")
-        if st.button("뉴스 수집 시작", type="primary", use_container_width=True):
+        nc1, nc2 = st.columns([0.7, 0.3])
+        if nc1.button("뉴스 수집 시작", type="primary", use_container_width=True, key="news_fetch_btn"):
             if not CLIENT_ID or not CLIENT_SECRET:
                 st.error("❌ 네이버 API 키가 설정되지 않았습니다. Streamlit Secrets에 NAVER_CLIENT_ID와 NAVER_CLIENT_SECRET을 등록해 주세요.")
             else:
                 with st.spinner("뉴스를 수집하는 중입니다..."):
                     all_news = []
-                    for kw in keywords:
+                    # 키워드 데이터 구조 호환성 처리 (객체 리스트 -> 문자열 리스트)
+                    kw_list = [k['name'] if isinstance(k, dict) else k for k in keywords]
+                    for kw in kw_list:
                         df = fetch_naver_news(kw, start_date, end_date)
                         if not df.empty:
                             df.insert(0, '키워드', kw)
                             all_news.append(df)
                     if all_news:
-                        st.dataframe(
-                            pd.concat(all_news), 
-                            use_container_width=True, 
-                            hide_index=True,
-                            column_config={
-                                "링크": st.column_config.LinkColumn("링크", display_text="🔗 링크 열기")
-                            }
-                        )
+                        st.session_state['latest_news_df'] = pd.concat(all_news)
                     else:
+                        st.session_state['latest_news_df'] = pd.DataFrame()
                         st.info("해당 기간 동안 검색된 뉴스가 없습니다.")
 
+        if 'latest_news_df' in st.session_state and not st.session_state['latest_news_df'].empty:
+            df = st.session_state['latest_news_df'].copy()
+            news_sort = nc2.selectbox("발행일 정렬", ["최신순", "오래된순"], key="news_sort_order")
+            
+            # 발행일 컬럼 정렬 적용
+            if '발행일' in df.columns:
+                df = df.sort_values(by='발행일', ascending=(news_sort == "오래된순"))
+                        
+            # HTML 테이블로 변환하여 내부 스크롤 제거
+            # fetch_naver_news에서 반환하는 실제 컬럼 매칭
+            # 제목을 클릭 가능한 링크로 변환하고 링크 컬럼 제거
+            def make_title_clickable(row):
+                return f'<a href="{row["링크"]}" target="_blank" style="text-decoration:none; color:#191F28; font-weight:600; hover:color:#0064FF;">{row["제목"]}</a>'
+            
+            df['제목'] = df.apply(make_title_clickable, axis=1)
+            df_display = df[['키워드', '제목', '언론사', '발행일']].copy()
+            
+            table_html = df_display.to_html(escape=False, index=False, classes='modern-table')
+            st.markdown(f'<div class="modern-table-container">{table_html}</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
     elif selected_menu == "🏢 경쟁사 최신 포스팅 스크랩 통합":
+        st.markdown('<div class="content-card">', unsafe_allow_html=True)
         st.subheader("🏢 경쟁사 최신 포스팅 분석 및 AI 콘텐츠 어시스턴트")
         
         with st.expander("⚙️ AI 생성 설정 (API 키 및 자사 정보)", expanded=False):
@@ -265,7 +594,8 @@ def main():
                                              placeholder="예: 우리는 10년 경력의 설치 노하우가 있고, 가격 경쟁력이 뛰어나며 24시간 AS를 지원합니다.")
             
         st.markdown("### 🔍 경쟁사 최신 포스팅 수집")
-        if st.button("경쟁사 포스팅 가져오기", type="primary", use_container_width=True):
+        cc1, cc2 = st.columns([0.7, 0.3])
+        if cc1.button("경쟁사 포스팅 가져오기", type="primary", use_container_width=True):
             all_blogs = []
             with st.spinner("경쟁사 블로그 수집 중..."):
                 for comp in competitors:
@@ -277,18 +607,26 @@ def main():
                 st.session_state['latest_blogs'] = all_blogs
                 st.success(f"총 {len(all_blogs)}개의 포스팅을 발견했습니다.")
             else:
+                st.session_state['latest_blogs'] = []
                 st.info("해당 기간 내 수집된 포스팅이 없습니다.")
 
         if 'latest_blogs' in st.session_state and st.session_state['latest_blogs']:
             blogs_df = pd.DataFrame(st.session_state['latest_blogs'])
-            st.dataframe(
-                blogs_df[['업체명', '발행일', '제목', '링크']], 
-                use_container_width=True, 
-                hide_index=True,
-                column_config={
-                    "링크": st.column_config.LinkColumn("링크", display_text="🔗 포스팅 열기")
-                }
-            )
+            comp_sort = cc2.selectbox("발행일 정렬", ["최신순", "오래된순"], key="comp_sort")
+            
+            if '발행일' in blogs_df.columns:
+                blogs_df = blogs_df.sort_values(by='발행일', ascending=(comp_sort == "오래된순"))
+            
+            # HTML 테이블로 변환하여 내부 스크롤 제거
+            # 제목을 클릭 가능한 링크로 변환하고 링크 컬럼 제거
+            def make_comp_title_clickable(row):
+                return f'<a href="{row["링크"]}" target="_blank" style="text-decoration:none; color:#191F28; font-weight:600;">{row["제목"]}</a>'
+            
+            blogs_df['제목'] = blogs_df.apply(make_comp_title_clickable, axis=1)
+            df_display = blogs_df[['업체명', '발행일', '제목']].copy()
+            
+            table_html = df_display.to_html(escape=False, index=False, classes='modern-table')
+            st.markdown(f'<div class="modern-table-container">{table_html}</div>', unsafe_allow_html=True)
             
             st.divider()
             st.markdown("### 🤖 분석 및 콘텐츠 자동 생성")
@@ -320,8 +658,8 @@ def main():
                     else:
                         col_l, col_r = st.columns(2)
                         with col_l:
-                            st.markdown("##### 📝 원본 내용 (요약)")
-                            st.text_area("원본 본문", full_content[:1500] + "\n\n... (이하 생략)", height=400, disabled=True)
+                            with st.expander("📝 원본 내용 보기", expanded=False):
+                                st.text_area("원본 본문", full_content[:1500] + "\n\n... (이하 생략)", height=400, disabled=True)
                         
                         with col_r:
                             st.markdown(f"##### 🤖 {ai_model} 생성 결과")
@@ -344,8 +682,10 @@ def main():
                                     elif img_url:
                                         st.image(img_url, caption="생성된 AI 썸네일", use_container_width=True)
                                         st.markdown(f"[🔗 이미지 원본 다운로드]({img_url})")
+        st.markdown('</div>', unsafe_allow_html=True)
 
     elif selected_menu == "📊 키워드 검색 트렌드 분석":
+        st.markdown('<div class="content-card">', unsafe_allow_html=True)
         st.subheader("📊 키워드 검색 트렌드 분석")
         if not trend_keywords:
             st.info("👈 좌측에서 트렌드 분석 키워드를 추가해 주세요.")
@@ -357,10 +697,12 @@ def main():
             show_absolute = st.toggle("절대 검색량(추정)으로 보기", value=True)
             if st.button("분석 실행", type="primary", use_container_width=True):
                 if len(d_range) == 2:
-                    df_nv = fetch_naver_datalab_trend(trend_keywords, d_range[0].strftime("%Y-%m-%d"), d_range[1].strftime("%Y-%m-%d"), time_unit=t_unit)
+                    # 키워드 리스트 정규화
+                    kw_list = [k['name'] if isinstance(k, dict) else k for k in trend_keywords]
+                    df_nv = fetch_naver_datalab_trend(kw_list, d_range[0].strftime("%Y-%m-%d"), d_range[1].strftime("%Y-%m-%d"), time_unit=t_unit)
                     if not df_nv.empty:
                         if show_absolute:
-                            for kw in trend_keywords:
+                            for kw in kw_list:
                                 vol = fetch_naver_search_volume(kw)
                                 max_ratio = df_nv[df_nv['키워드'] == kw]['트렌드지수'].max()
                                 scaler = vol['total'] / (max_ratio if max_ratio > 0 else 1)
@@ -369,24 +711,40 @@ def main():
                             df_nv['표시수치'] = df_nv['트렌드지수']
                         
                         fig = px.line(df_nv, x='날짜', y='표시수치', color='키워드', markers=True, template='plotly_white')
+                        fig.update_layout(
+                            font_family="Pretendard",
+                            hovermode="x unified",
+                            plot_bgcolor='rgba(0,0,0,0)',
+                            paper_bgcolor='rgba(0,0,0,0)',
+                            margin=dict(l=0, r=0, t=30, b=0),
+                            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                        )
+                        fig.update_traces(line_width=3, marker=dict(size=8))
                         st.plotly_chart(fig, use_container_width=True)
                         st.download_button("📊 CSV 다운로드", data=df_nv.to_csv(index=False).encode('utf-8'), file_name="trend_analysis.csv")
                 else:
                     st.warning("기간을 시작일과 종료일 모두 선택해주세요.")
+        st.markdown('</div>', unsafe_allow_html=True)
 
     elif selected_menu == "🏆 네이버 상위노출 현황":
+        st.markdown('<div class="content-card">', unsafe_allow_html=True)
         st.subheader("🏆 네이버 통합검색 상위노출 현황")
         if not rank_keywords:
             st.info("👈 좌측 설정에서 상위노출을 확인할 키워드를 관리해주세요.")
         else:
-            target_name = st.text_input("추적할 업체/브랜드명 (미입력 시 자사명)", value=COMPANY_NAME)
+            c_target, c_sort = st.columns([0.7, 0.3])
+            target_name = c_target.text_input("추적할 업체/브랜드명 (미입력 시 자사명)", value=COMPANY_NAME)
+            sort_order = c_sort.selectbox("순위 정렬", ["정렬 안함", "순위 높은 순 (1위~)", "순위 낮은 순"])
+            
             if st.button("순위 추적 시작", type="primary", use_container_width=True):
                 if not CLIENT_ID or not CLIENT_SECRET:
                     st.error("❌ 네이버 API 키가 설정되지 않았습니다. Streamlit Secrets 설정을 확인해 주세요.")
                 else:
                     with st.spinner("상위노출 순위를 조회하는 중입니다..."):
                         results = []
-                        for kw in rank_keywords:
+                        # 키워드 데이터 구조 호환성 처리
+                        rk_list = [k['name'] if isinstance(k, dict) else k for k in rank_keywords]
+                        for kw in rk_list:
                             rank_data = fetch_naver_rank(kw, target_name)
                             # collector_utils의 fetch_naver_rank 결과를 기반으로 노출 여부 판별
                             is_found = 1 <= rank_data.get('rank', 999) <= 100
@@ -401,44 +759,41 @@ def main():
                             results.append({
                                 "키워드": kw,
                                 "검색대상": target_name,
-                                "노출 여부": "✅ 노출 중" if is_found else "❌ 미노출",
-                                "순위/위치": f"{rank_data['rank']}위 (블로그)" if is_found else "-",
+                                "노출 여부": is_found,
+                                "순위/위치": rank_data['rank'] if is_found else 999,
                                 "블로그명": rank_data.get('blogger', '-'),
                                 "제목": title_html
                             })
 
-                
                 df = pd.DataFrame(results)
                 
-                def highlight_row(row):
-                    val = row['순위/위치']
-                    if val == "-": 
-                        color = '#f8d7da' # 빨간색
-                    else:
-                        try:
-                            rank = int(val.split("위")[0])
-                            if rank <= 5: color = '#d4edda' # 초록색
-                            elif 6 <= rank <= 15: color = '#fff3cd' # 노란색
-                            else: color = '#f8d7da' # 빨간색
-                        except:
-                            color = '#f8d7da'
-                    return [f'background-color: {color}; color: black'] * len(row)
+                # 정렬 적용
+                if sort_order == "순위 높은 순 (1위~)":
+                    df = df.sort_values(by="순위/위치", ascending=True)
+                elif sort_order == "순위 낮은 순":
+                    df = df.sort_values(by="순위/위치", ascending=False)
+                
+                # HTML 테이블 생성을 위한 커스텀 포맷터
+                def format_status(val):
+                    if val: return '<span class="badge badge-green">✅ 노출 중</span>'
+                    return '<span class="badge badge-red">❌ 미노출</span>'
+                
+                def format_rank(val):
+                    if val == 999: return '<span style="color: #8B95A1;">-</span>'
+                    if val <= 5: color = "badge-green"
+                    elif val <= 15: color = "badge-yellow"
+                    else: color = "badge-red"
+                    return f'<span class="badge {color}">{val}위</span>'
 
-                styled_df = df.style.apply(highlight_row, axis=1).hide(axis="index")
-                
-                table_html = styled_df.set_table_styles([
-                    {'selector': 'table', 'props': [('width', '100%'), ('border-collapse', 'collapse'), ('margin-top', '10px'), ('font-size', '14px')]},
-                    {'selector': 'th, td', 'props': [('border', '1px solid #ddd'), ('padding', '12px 8px'), ('text-align', 'left')]},
-                    {'selector': 'th', 'props': [('background-color', '#f8f9fa'), ('font-weight', 'bold'), ('color', '#333'), ('white-space', 'nowrap')]},
-                    # 키워드, 검색대상, 노출여부, 순위/위치 컬럼은 줄바꿈 방지
-                    {'selector': 'td:nth-child(1), td:nth-child(2), td:nth-child(3), td:nth-child(4)', 'props': [('white-space', 'nowrap'), ('min-width', '80px')]},
-                    # 제목 컬럼은 최소 너비 확보 및 자연스러운 줄바꿈
-                    {'selector': 'td:nth-child(6)', 'props': [('min-width', '300px')]}
-                ]).to_html(escape=False)
-                
-                st.markdown(table_html, unsafe_allow_html=True)
+                df['노출 여부'] = df['노출 여부'].apply(format_status)
+                df['순위/위치'] = df['순위/위치'].apply(format_rank)
+
+                table_html = df.to_html(escape=False, index=False, classes='modern-table')
+                st.markdown(f'<div class="modern-table-container">{table_html}</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     elif selected_menu == "💡 LED 특화 키워드 선점 추천":
+        st.markdown('<div class="content-card">', unsafe_allow_html=True)
         st.subheader("💡 LED 전광판 특화 키워드 선점 전략")
         st.markdown("""
         이 메뉴는 AI가 **LED 전광판** 시장의 흐름을 분석하여, 현재 우리가 네이버 블로그에서 선점하면 좋은 알짜배기 키워드들을 제안해 드립니다.
@@ -458,6 +813,7 @@ def main():
                     suggestions = ai_utils.generate_led_keywords(target_key, model_type=m_type)
                     st.markdown(suggestions)
                     st.download_button("💡 키워드 제안서 다운로드", data=suggestions, file_name=f"led_keyword_strategy_{m_type}.md")
+        st.markdown('</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()

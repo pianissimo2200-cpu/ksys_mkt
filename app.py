@@ -359,10 +359,10 @@ def check_password():
 def main():
     st.set_page_config(page_title="마케팅 인사이트 대시보드", page_icon="📈", layout="wide")
     
+    inject_custom_css()
+    
     if not check_password():
         st.stop()
-        
-    inject_custom_css()
     
     # API 키 초기 로드 (함수 최상단에서 선언하여 에러 방지)
     st.session_state['gemini_key'] = os.environ.get("GEMINI_API_KEY", get_secret("GEMINI_API_KEY", ""))

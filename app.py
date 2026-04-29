@@ -16,9 +16,8 @@ def inject_custom_css():
         /* Pretendard 폰트 로드 */
         @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
         
-        html, body, [class*="css"], .stMarkdown, p, div, span {
+        html, body, [class*="css"], .stMarkdown, p {
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif !important;
-            color: #191F28; /* 기본 텍스트 색상 명시 */
         }
         
         /* 스트림릿 기본 요소 대비 강화 */
@@ -248,6 +247,67 @@ def inject_custom_css():
         }
         </style>
     """, unsafe_allow_html=True)
+
+def render_sortable_html_table(df_display, classes='modern-table'):
+    """HTML 테이블에 CSS와 정렬 기능을 위한 JS를 삽입하여 반환합니다."""
+    table_html = df_display.to_html(escape=False, index=False, classes=classes)
+    
+    css = """
+    <style>
+        @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
+        body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; background-color: transparent; }
+        .modern-table { width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 12px; border: 1px solid #F2F4F7; }
+        .modern-table th { background-color: #F9FAFB; padding: 12px 16px; text-align: left; font-weight: 600; color: #4E5968; border-bottom: 1px solid #F2F4F7; cursor: pointer; user-select: none; transition: background-color 0.2s; }
+        .modern-table th:hover { background-color: #E5E8EB; }
+        .modern-table td { padding: 14px 16px; border-bottom: 1px solid #F2F4F7; color: #191F28; vertical-align: middle; font-size: 14px; }
+        .modern-table td a { color: #191F28; text-decoration: none; transition: color 0.2s ease; }
+        .modern-table td a:hover { color: #0064FF; text-decoration: underline; }
+        .badge { padding: 4px 12px; border-radius: 50px; font-size: 12px; font-weight: 600; display: inline-block; white-space: nowrap; }
+        .badge-green { background-color: #E6F4F1; color: #008485; }
+        .badge-red { background-color: #FEEBEB; color: #E91E63; }
+        .badge-yellow { background-color: #FFF8E1; color: #FF8F00; }
+    </style>
+    """
+    
+    js = """
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const table = document.querySelector('.modern-table');
+        const ths = table.querySelectorAll('th');
+        ths.forEach((th, idx) => {
+            th.title = '클릭하여 정렬';
+            th.onclick = function() {
+                const asc = this.asc = !this.asc;
+                const tbody = table.querySelector('tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                
+                rows.sort((a, b) => {
+                    const v1 = a.children[idx].innerText.trim();
+                    const v2 = b.children[idx].innerText.trim();
+                    
+                    // 1. 날짜 파싱 시도
+                    const d1 = Date.parse(v1.replace(' ', 'T'));
+                    const d2 = Date.parse(v2.replace(' ', 'T'));
+                    if (!isNaN(d1) && !isNaN(d2)) return asc ? d1 - d2 : d2 - d1;
+                    
+                    // 2. 숫자 파싱 시도 (순위 등)
+                    const n1 = parseFloat(v1.replace(/[^0-9.-]+/g,''));
+                    const n2 = parseFloat(v2.replace(/[^0-9.-]+/g,''));
+                    if (!isNaN(n1) && !isNaN(n2)) return asc ? n1 - n2 : n2 - n1;
+                    
+                    // 3. 문자열 비교
+                    return asc ? v1.localeCompare(v2) : v2.localeCompare(v1);
+                });
+                
+                rows.forEach(tr => tbody.appendChild(tr));
+                ths.forEach(h => h.innerHTML = h.innerHTML.replace(/ [▲▼]/g, ''));
+                this.innerHTML += asc ? ' ▲' : ' ▼';
+            };
+        });
+    });
+    </script>
+    """
+    return f"<!DOCTYPE html><html><head>{css}</head><body>{table_html}{js}</body></html>"
 
 # 환경 변수 로드 (.env)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -548,8 +608,7 @@ def main():
     if selected_menu == "📰 네이버 주요 뉴스 스크랩 통합":
         st.markdown('<div class="content-card">', unsafe_allow_html=True)
         st.subheader("📰 뉴스 통합 브리핑")
-        nc1, nc2 = st.columns([0.7, 0.3])
-        if nc1.button("뉴스 수집 시작", type="primary", use_container_width=True, key="news_fetch_btn"):
+        if st.button("뉴스 수집 시작", type="primary", use_container_width=True, key="news_fetch_btn"):
             if not CLIENT_ID or not CLIENT_SECRET:
                 st.error("❌ 네이버 API 키가 설정되지 않았습니다. Streamlit Secrets에 NAVER_CLIENT_ID와 NAVER_CLIENT_SECRET을 등록해 주세요.")
             else:
@@ -570,23 +629,21 @@ def main():
 
         if 'latest_news_df' in st.session_state and not st.session_state['latest_news_df'].empty:
             df = st.session_state['latest_news_df'].copy()
-            news_sort = nc2.selectbox("발행일 정렬", ["최신순", "오래된순"], key="news_sort_order")
             
-            # 발행일 컬럼 정렬 적용
+            # 발행일 컬럼 기본 정렬 (최신순)
             if '발행일' in df.columns:
-                df = df.sort_values(by='발행일', ascending=(news_sort == "오래된순"))
+                df = df.sort_values(by='발행일', ascending=False)
                         
-            # HTML 테이블로 변환하여 내부 스크롤 제거
-            # fetch_naver_news에서 반환하는 실제 컬럼 매칭
             # 제목을 클릭 가능한 링크로 변환하고 링크 컬럼 제거
             def make_title_clickable(row):
-                return f'<a href="{row["링크"]}" target="_blank" style="text-decoration:none; color:#191F28; font-weight:600; hover:color:#0064FF;">{row["제목"]}</a>'
+                return f'<a href="{row["링크"]}" target="_blank" style="text-decoration:none; color:#191F28; font-weight:600;">{row["제목"]}</a>'
             
             df['제목'] = df.apply(make_title_clickable, axis=1)
             df_display = df[['키워드', '제목', '언론사', '발행일']].copy()
             
-            table_html = df_display.to_html(escape=False, index=False, classes='modern-table')
-            st.markdown(f'<div class="modern-table-container">{table_html}</div>', unsafe_allow_html=True)
+            html_content = render_sortable_html_table(df_display)
+            calc_height = len(df_display) * 48 + 50
+            st.components.v1.html(html_content, height=calc_height, scrolling=False)
         st.markdown('</div>', unsafe_allow_html=True)
 
     elif selected_menu == "🏢 경쟁사 최신 포스팅 스크랩 통합":
@@ -615,8 +672,7 @@ def main():
                                              placeholder="예: 우리는 10년 경력의 설치 노하우가 있고, 가격 경쟁력이 뛰어나며 24시간 AS를 지원합니다.")
             
         st.markdown("### 🔍 경쟁사 최신 포스팅 수집")
-        cc1, cc2 = st.columns([0.7, 0.3])
-        if cc1.button("경쟁사 포스팅 가져오기", type="primary", use_container_width=True):
+        if st.button("경쟁사 포스팅 가져오기", type="primary", use_container_width=True):
             all_blogs = []
             with st.spinner("경쟁사 블로그 수집 중..."):
                 for comp in competitors:
@@ -633,12 +689,10 @@ def main():
 
         if 'latest_blogs' in st.session_state and st.session_state['latest_blogs']:
             blogs_df = pd.DataFrame(st.session_state['latest_blogs'])
-            comp_sort = cc2.selectbox("발행일 정렬", ["최신순", "오래된순"], key="comp_sort")
             
             if '발행일' in blogs_df.columns:
-                blogs_df = blogs_df.sort_values(by='발행일', ascending=(comp_sort == "오래된순"))
+                blogs_df = blogs_df.sort_values(by='발행일', ascending=False)
             
-            # HTML 테이블로 변환하여 내부 스크롤 제거
             # 제목을 클릭 가능한 링크로 변환하고 링크 컬럼 제거
             def make_comp_title_clickable(row):
                 return f'<a href="{row["링크"]}" target="_blank" style="text-decoration:none; color:#191F28; font-weight:600;">{row["제목"]}</a>'
@@ -646,8 +700,9 @@ def main():
             blogs_df['제목'] = blogs_df.apply(make_comp_title_clickable, axis=1)
             df_display = blogs_df[['업체명', '발행일', '제목']].copy()
             
-            table_html = df_display.to_html(escape=False, index=False, classes='modern-table')
-            st.markdown(f'<div class="modern-table-container">{table_html}</div>', unsafe_allow_html=True)
+            html_content = render_sortable_html_table(df_display)
+            calc_height = len(df_display) * 48 + 50
+            st.components.v1.html(html_content, height=calc_height, scrolling=False)
             
             st.divider()
             st.markdown("### 🤖 분석 및 콘텐츠 자동 생성")
@@ -753,10 +808,7 @@ def main():
         if not rank_keywords:
             st.info("👈 좌측 설정에서 상위노출을 확인할 키워드를 관리해주세요.")
         else:
-            c_target, c_sort = st.columns([0.7, 0.3])
-            target_name = c_target.text_input("추적할 업체/브랜드명 (미입력 시 자사명)", value=COMPANY_NAME)
-            sort_order = c_sort.selectbox("순위 정렬", ["정렬 안함", "순위 높은 순 (1위~)", "순위 낮은 순"])
-            
+            target_name = st.text_input("추적할 업체/브랜드명 (미입력 시 자사명)", value=COMPANY_NAME)
             if st.button("순위 추적 시작", type="primary", use_container_width=True):
                 if not CLIENT_ID or not CLIENT_SECRET:
                     st.error("❌ 네이버 API 키가 설정되지 않았습니다. Streamlit Secrets 설정을 확인해 주세요.")
@@ -788,12 +840,6 @@ def main():
 
                 df = pd.DataFrame(results)
                 
-                # 정렬 적용
-                if sort_order == "순위 높은 순 (1위~)":
-                    df = df.sort_values(by="순위/위치", ascending=True)
-                elif sort_order == "순위 낮은 순":
-                    df = df.sort_values(by="순위/위치", ascending=False)
-                
                 # HTML 테이블 생성을 위한 커스텀 포맷터
                 def format_status(val):
                     if val: return '<span class="badge badge-green">✅ 노출 중</span>'
@@ -809,8 +855,9 @@ def main():
                 df['노출 여부'] = df['노출 여부'].apply(format_status)
                 df['순위/위치'] = df['순위/위치'].apply(format_rank)
 
-                table_html = df.to_html(escape=False, index=False, classes='modern-table')
-                st.markdown(f'<div class="modern-table-container">{table_html}</div>', unsafe_allow_html=True)
+                html_content = render_sortable_html_table(df)
+                calc_height = len(df) * 48 + 50
+                st.components.v1.html(html_content, height=calc_height, scrolling=False)
         st.markdown('</div>', unsafe_allow_html=True)
 
     elif selected_menu == "💡 LED 특화 키워드 선점 추천":

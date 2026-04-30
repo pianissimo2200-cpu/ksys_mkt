@@ -648,29 +648,6 @@ def main():
 
     elif selected_menu == "경쟁사 포스팅 분석":
         st.markdown('<div class="content-card">', unsafe_allow_html=True)
-        st.subheader("경쟁사 최신 포스팅 분석 및 AI 콘텐츠 어시스턴트")
-        
-        with st.expander("AI 콘텐츠 생성 설정 (API 키 및 자사 정보)", expanded=False):
-            st.markdown("경쟁사 블로그 본문을 분석하고 AI가 글과 이미지를 자동 생성하기 위해 설정이 필요합니다.")
-            
-            c1, c2 = st.columns([0.8, 0.2])
-            st.session_state['gemini_key'] = c1.text_input("Gemini API Key", type="password", value=st.session_state['gemini_key'])
-            if c2.button("Gemini 키 확인", use_container_width=True):
-                is_valid, msg = ai_utils.validate_gemini_key(st.session_state['gemini_key'])
-                if is_valid: st.success(f"✅ {msg}")
-                else: st.error(f"❌ {msg}")
-            
-            c3, c4 = st.columns([0.8, 0.2])
-            st.session_state['openai_key'] = c3.text_input("OpenAI API Key", type="password", value=st.session_state['openai_key'])
-            if c4.button("OpenAI 키 확인", use_container_width=True):
-                is_valid, msg = ai_utils.validate_openai_key(st.session_state['openai_key'])
-                if is_valid: st.success(f"✅ {msg}")
-                else: st.error(f"❌ {msg}")
-                    
-            company_positioning = st.text_area("자사 기본 정보 및 강조할 강점", 
-                                             value="우리는 우수한 기술력과 합리적인 가격, 그리고 신속한 사후 관리를 제공합니다.",
-                                             placeholder="예: 우리는 10년 경력의 설치 노하우가 있고, 가격 경쟁력이 뛰어나며 24시간 AS를 지원합니다.")
-            
         st.markdown("### 🔍 경쟁사 최신 포스팅 수집")
         if st.button("경쟁사 포스팅 가져오기", type="primary", use_container_width=True):
             all_blogs = []
@@ -704,65 +681,12 @@ def main():
             calc_height = len(df_display) * 48 + 50
             st.components.v1.html(html_content, height=calc_height, scrolling=False)
             
-            st.divider()
-            st.markdown("### 🤖 분석 및 콘텐츠 자동 생성")
-            col_sel, col_opt, col_btn = st.columns([0.4, 0.3, 0.3])
-            
-            blog_list = st.session_state['latest_blogs']
-            titles = [f"[{b['업체명']}] {b['제목']}" for b in blog_list]
-            selected_title = col_sel.selectbox("분석할 포스팅 선택", titles)
-            selected_post = blog_list[titles.index(selected_title)]
-            
-            with col_opt:
-                ai_model = st.radio("사용할 AI 모델", ["Gemini (1.5 Flash)", "GPT (4o)"], horizontal=True)
-                gen_option = st.radio("생성 범위", ["글만 생성", "이미지만 생성", "글 + 이미지 모두 생성"], horizontal=True)
-            
-            if col_btn.button("✨ 콘텐츠 생성 시작", use_container_width=True):
-                m_type = 'gemini' if "Gemini" in ai_model else 'gpt'
-                target_key = st.session_state['gemini_key'] if m_type == 'gemini' else st.session_state['openai_key']
-                
-                if not target_key and ("글" in gen_option or "모두" in gen_option):
-                    st.error(f"텍스트 생성을 위해 {m_type.upper()} API Key를 입력해주세요.")
-                elif not openai_key and ("이미지" in gen_option or "모두" in gen_option):
-                    st.error("이미지 생성을 위해 OpenAI API Key를 입력해주세요.")
-                else:
-                    with st.spinner("경쟁사 블로그 본문을 스크래핑하는 중..."):
-                        full_content = utils.fetch_blog_full_content(selected_post['링크'])
-                    
-                    if not full_content:
-                        st.error("본문 스크래핑에 실패했습니다. (네이버 블로그 본문만 지원됩니다)")
-                    else:
-                        col_l, col_r = st.columns(2)
-                        with col_l:
-                            with st.expander("📝 원본 내용 보기", expanded=False):
-                                st.text_area("원본 본문", full_content[:1500] + "\n\n... (이하 생략)", height=400, disabled=True)
-                        
-                        with col_r:
-                            st.markdown(f"##### 🤖 {ai_model} 생성 결과")
-                            topic_summary = selected_post['제목']
-                            
-                            # 텍스트 생성
-                            if "글" in gen_option or "모두" in gen_option:
-                                with st.spinner(f"{ai_model}가 분석 및 작성 중..."):
-                                    generated_text = ai_utils.analyze_and_generate_post(full_content, company_positioning, target_key, model_type=m_type)
-                                    st.markdown(generated_text)
-                                    st.download_button("📝 텍스트 다운로드", data=generated_text, file_name=f"generated_post_{m_type}.md", mime="text/markdown")
-                                    topic_summary = generated_text[:200].replace('#', '').replace('*', '')
-                            
-                            # 이미지 생성
-                            if "이미지" in gen_option or "모두" in gen_option:
-                                with st.spinner("DALL-E 3가 썸네일 이미지를 생성하는 중..."):
-                                    img_url, img_err = ai_utils.generate_blog_image(topic_summary, st.session_state['openai_key'])
-                                    if img_err:
-                                        st.error(img_err)
-                                    elif img_url:
-                                        st.image(img_url, caption="생성된 AI 썸네일", use_container_width=True)
-                                        st.markdown(f"[🔗 이미지 원본 다운로드]({img_url})")
+
         st.markdown('</div>', unsafe_allow_html=True)
 
     elif selected_menu == "검색 트렌드 분석":
         st.markdown('<div class="content-card">', unsafe_allow_html=True)
-        st.subheader("📊 키워드 검색 트렌드 분석")
+        st.subheader("키워드 검색 트렌드 분석")
         if not trend_keywords:
             st.info("👈 좌측에서 트렌드 분석 키워드를 추가해 주세요.")
         else:
@@ -862,7 +786,7 @@ def main():
 
     elif selected_menu == "키워드 선점 추천":
         st.markdown('<div class="content-card">', unsafe_allow_html=True)
-        st.subheader("💡 LED 전광판 특화 키워드 선점 전략")
+        st.subheader("LED 전광판 특화 키워드 선점 전략")
         st.markdown("""
         이 메뉴는 AI가 **LED 전광판** 시장의 흐름을 분석하여, 현재 우리가 네이버 블로그에서 선점하면 좋은 알짜배기 키워드들을 제안해 드립니다.
         """)

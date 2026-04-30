@@ -726,7 +726,7 @@ def main():
                     st.warning("기간을 시작일과 종료일 모두 선택해주세요.")
         st.markdown('</div>', unsafe_allow_html=True)
 
-    elif selected_menu == "🏆 네이버 상위노출 현황":
+    elif selected_menu == "네이버 상위노출 추적":
         st.markdown('<div class="content-card">', unsafe_allow_html=True)
         st.subheader("🏆 네이버 통합검색 상위노출 현황")
         if not rank_keywords:

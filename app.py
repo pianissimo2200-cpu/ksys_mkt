@@ -870,12 +870,25 @@ def main():
                     df_csv = df_csv.drop(columns=['링크'])
                 csv_data = df_csv.to_csv(index=False).encode('utf-8-sig')
                 
-                # 버튼 텍스트 줄바꿈 방지를 위한 CSS 주입
+                # 버튼 스타일 고도화 (기본 회색 -> 호버 시 초록색)
                 st.markdown("""
                     <style>
                     div.stDownloadButton > button {
                         white-space: nowrap !important;
                         margin-top: 4px !important;
+                        background-color: #f0f2f6 !important;
+                        color: #31333f !important;
+                        border: 1px solid #dcdfe6 !important;
+                        border-radius: 8px !important;
+                        padding: 0.5rem 1rem !important;
+                        transition: all 0.3s ease !important;
+                        font-weight: 500 !important;
+                    }
+                    div.stDownloadButton > button:hover {
+                        background-color: #217346 !important; /* Excel Green */
+                        color: white !important;
+                        border-color: #217346 !important;
+                        box-shadow: 0 4px 12px rgba(33, 115, 70, 0.2) !important;
                     }
                     </style>
                 """, unsafe_allow_html=True)

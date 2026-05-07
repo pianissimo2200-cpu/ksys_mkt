@@ -873,28 +873,30 @@ def main():
                 # 버튼 스타일 정밀 고도화 (시인성 및 애니메이션 강화)
                 st.markdown("""
                     <style>
-                    div.stDownloadButton > button {
+                    [data-testid="stDownloadButton"] button {
                         white-space: nowrap !important;
                         width: 100% !important;
-                        height: 46px !important; /* 요약 박스와 균형을 맞춘 높이 */
-                        background-color: #f8f9fa !important;
-                        color: #191f28 !important;
-                        border: 1px solid #e5e8eb !important;
+                        height: 48px !important; /* 요약 박스와 균형을 맞춘 높이 */
+                        background-color: #f0f2f6 !important;
+                        border: 1px solid #dcdfe6 !important;
                         border-radius: 12px !important;
-                        font-weight: 600 !important;
-                        font-size: 15px !important;
                         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
                         box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
-                        display: flex !important;
-                        align-items: center !important;
-                        justify-content: center !important;
                     }
-                    div.stDownloadButton > button:hover {
+                    [data-testid="stDownloadButton"] button p {
+                        color: #191f28 !important; /* 기본 검정 텍스트 */
+                        font-weight: 600 !important;
+                        font-size: 15px !important;
+                        transition: color 0.2s ease !important;
+                    }
+                    [data-testid="stDownloadButton"] button:hover {
                         background-color: #217346 !important; /* Excel Green */
-                        color: white !important;
                         border-color: #217346 !important;
                         transform: translateY(-2px) !important;
-                        box-shadow: 0 8px 20px rgba(33, 115, 70, 0.15) !important;
+                        box-shadow: 0 8px 20px rgba(33, 115, 70, 0.2) !important;
+                    }
+                    [data-testid="stDownloadButton"] button:hover p {
+                        color: #ffffff !important; /* 호버 시 흰색 텍스트 */
                     }
                     /* st.info 박스 하단 여백 제거하여 정렬 보정 */
                     div.stAlert {

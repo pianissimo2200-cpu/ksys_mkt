@@ -841,13 +841,8 @@ def main():
                             rank_data = fetch_naver_rank(kw, target_name)
                             # collector_utils의 fetch_naver_rank 결과를 기반으로 노출 여부 판별
                             is_found = 1 <= rank_data.get('rank', 999) <= 100
-                            
                             title = rank_data.get('title', '-')
                             link = rank_data.get('link', '-')
-                            if link != "-":
-                                title_html = f'<a href="{link}" target="_blank" style="text-decoration:none; color:#0366d6; font-weight:bold;">{title}</a>'
-                            else:
-                                title_html = title
         
                             results.append({
                                 "No": i + 1,
@@ -856,7 +851,8 @@ def main():
                                 "노출 여부": is_found,
                                 "순위/위치": rank_data['rank'] if is_found else 999,
                                 "블로그명": rank_data.get('blogger', '-'),
-                                "제목": title_html
+                                "제목": title,
+                                "링크": link
                             })
                             progress_bar.progress((i + 1) / len(rk_list))
                             time.sleep(0.1) # API 부하 방지 및 안정성 확보
@@ -866,8 +862,28 @@ def main():
 
                 df = pd.DataFrame(results)
                 
-                # 상단에 요약 정보 표시
-                st.info(f"💡 총 {len(df)}개의 키워드 중 {len(df[df['노출 여부'] == True])}개가 100위권 내에 노출 중입니다.")
+                # CSV 데이터 변환 (HTML 적용 전 순수 텍스트 상태)
+                df_csv = df.copy()
+                df_csv['노출 여부'] = df_csv['노출 여부'].apply(lambda x: '노출 중' if x else '미노출')
+                df_csv['순위/위치'] = df_csv['순위/위치'].apply(lambda x: '-' if x == 999 else f"{x}위")
+                if '링크' in df_csv.columns:
+                    df_csv = df_csv.drop(columns=['링크'])
+                csv_data = df_csv.to_csv(index=False).encode('utf-8-sig')
+                
+                # 상단에 요약 정보 및 다운로드 버튼 표시 (컬럼 분할)
+                c1, c2 = st.columns([0.8, 0.2])
+                c1.info(f"💡 총 {len(df)}개의 키워드 중 {len(df[df['노출 여부'] == True])}개가 100위권 내에 노출 중입니다.")
+                c2.download_button("📥 CSV 다운받기", data=csv_data, file_name="naver_rank_results.csv", use_container_width=True)
+                
+                # 화면 표시용 데이터 변환 (HTML 적용)
+                def make_title_clickable(row):
+                    if row["링크"] != "-":
+                        return f'<a href="{row["링크"]}" target="_blank" style="text-decoration:none; color:#0366d6; font-weight:bold;">{row["제목"]}</a>'
+                    return row["제목"]
+                
+                df['제목'] = df.apply(make_title_clickable, axis=1)
+                if '링크' in df.columns:
+                    df = df.drop(columns=['링크'])
                 
                 # HTML 테이블 생성을 위한 커스텀 포맷터
                 def format_status(val):

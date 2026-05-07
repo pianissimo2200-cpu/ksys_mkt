@@ -885,8 +885,9 @@ def main():
                 df['순위/위치'] = df['순위/위치'].apply(format_rank)
 
                 html_content = render_sortable_html_table(df)
-                calc_height = len(df) * 48 + 80
-                st.components.v1.html(html_content, height=calc_height, scrolling=False)
+                # 행 높이를 넉넉하게 65px로 계산하고 헤더/여백을 위해 100px 추가
+                calc_height = min(len(df) * 65 + 100, 1200) # 최대 높이 제한 (스크롤 활성화 대비)
+                st.components.v1.html(html_content, height=calc_height, scrolling=True)
 
 
 

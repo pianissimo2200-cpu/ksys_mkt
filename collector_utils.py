@@ -62,7 +62,19 @@ MEDIA_MAP = {
     "womentimes.co.kr": "우먼타임스", "viva100.com": "브릿지경제", "tvreport.co.kr": "TV리포트",
     "thepublic.kr": "더퍼블릭", "thedrive.co.kr": "더드라이브", "tenasia.co.kr": "텐아시아",
     "spotvnews.co.kr": "스포티비뉴스", "public25.com": "퍼블릭뉴스", "press9.kr": "프레스나인",
-    "pointdaily.co.kr": "포인트데일리", "pinpointnews.co.kr": "핀포인트뉴스"
+    "pointdaily.co.kr": "포인트데일리", "pinpointnews.co.kr": "핀포인트뉴스",
+    "osen.co.kr": "OSEN", "opinionnews.co.kr": "오피니언뉴스", "newsworker.co.kr": "뉴스워커",
+    "newspenguin.com": "뉴스펭귄", "newslock.co.kr": "뉴스락", "news2day.co.kr": "뉴스투데이",
+    "news.tf.co.kr": "더팩트", "tf.co.kr": "더팩트", "news.ifm.kr": "경인방송", "ifm.kr": "경인방송",
+    "news.dealsitetv.com": "딜사이트", "dealsite.co.kr": "딜사이트", "mydaily.co.kr": "마이데일리",
+    "maniareport.com": "마니아타임즈", "joongangenews.com": "중앙이코노미뉴스", "jeonmae.co.kr": "전남매일",
+    "insight.co.kr": "인사이트", "hg-times.com": "한강타임즈", "ggilbo.com": "금강일보", "gasnews.com": "가스신문",
+    "korea.kr": "정책브리핑", "wikitree.co.kr": "위키트리", "dispatch.co.kr": "디스패치",
+    "fnnews.com": "파이낸셜뉴스", "bizwatch.co.kr": "비즈워치", "thebell.co.kr": "더벨",
+    "paxnetnews.com": "팍스넷뉴스", "xportsnews.com": "엑스포츠뉴스", "stoo.com": "스포츠투데이",
+    "joynews24.com": "조이뉴스24", "sports.khan.co.kr": "스포츠경향", "isplus.com": "일간스포츠",
+    "sporbiz.co.kr": "스포츠한국", "sportsw.kr": "스포츠W", "slist.kr": "싱글리스트",
+    "celuvmedia.com": "셀럽미디어", "tvdaily.co.kr": "티브이데일리"
 }
 
 def get_media_name(domain):

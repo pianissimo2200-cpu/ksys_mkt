@@ -120,15 +120,16 @@ def inject_custom_css():
         }
 
         /* 입력창 스타일 (텍스트) */
+        /* 입력창 스타일 (텍스트) */
         .stTextInput input {
             border-radius: 14px !important;
             border: 1px solid #E5E8EB !important;
-            padding: 0 1.2rem !important; /* 좌우 패딩만 유지, 상하는 0으로 하여 height와 line-height로 정렬 */
+            padding: 1rem 1.2rem !important; /* 상하 여백을 동일하게 주어 중앙 정렬 강제 */
             height: 3.5rem !important;
-            line-height: 3.5rem !important; /* height와 동일하게 하여 세로 중앙 정렬 */
             background-color: #F9FAFB !important;
             color: #191F28 !important;
             transition: all 0.2s ease !important;
+            line-height: normal !important;
         }
         .stTextInput input:focus {
             border-color: #3182F6 !important;
@@ -140,15 +141,15 @@ def inject_custom_css():
         .stDateInput input {
             border-radius: 12px !important;
             border: 1px solid #E5E8EB !important;
-            padding: 0 1rem !important;
+            padding: 0.6rem 1rem !important; /* 상하 여백 균형 */
             height: 3rem !important;
-            line-height: 3rem !important; /* 세로 중앙 정렬 */
             background-color: #FFFFFF !important;
             color: #191F28 !important;
             box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important;
             font-weight: 500 !important;
             text-align: center !important;
             transition: all 0.2s ease !important;
+            line-height: normal !important;
         }
         .stDateInput input:focus {
             border-color: #3182F6 !important;

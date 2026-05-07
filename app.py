@@ -76,20 +76,32 @@ def inject_custom_css():
         }
 
         /* Primary 버튼 (파란색 강제 적용 - 모든 주요 버튼 포함) */
-        .stApp button[data-testid*="primary"],
-        .stApp button[kind="primary"],
-        .stApp .stButton > button:first-child[class*="st-"] {
+        .stApp button[data-testid*="primary"]:not(:disabled),
+        .stApp button[kind="primary"]:not(:disabled),
+        .stApp .stButton > button:first-child[class*="st-"]:not(:disabled) {
             background-color: #3182F6 !important; /* 토스 블루 */
             color: #FFFFFF !important;
             border: none !important;
             box-shadow: 0 4px 12px rgba(49, 130, 246, 0.2) !important;
         }
-        .stApp button[data-testid*="primary"]:hover,
-        .stApp button[kind="primary"]:hover {
+        .stApp button[data-testid*="primary"]:not(:disabled):hover,
+        .stApp button[kind="primary"]:not(:disabled):hover,
+        .stApp .stButton > button:first-child[class*="st-"]:not(:disabled):hover {
             background-color: #1B64DA !important;
             box-shadow: 0 6px 16px rgba(49, 130, 246, 0.3) !important;
             transform: translateY(-1px) !important;
             color: #FFFFFF !important;
+        }
+
+        /* 비활성화(Disabled) 버튼 스타일 (회색) */
+        .stApp button:disabled,
+        .stApp button[disabled] {
+            background-color: #F2F4F6 !important;
+            color: #B0B8C1 !important;
+            border: none !important;
+            box-shadow: none !important;
+            transform: none !important;
+            cursor: not-allowed !important;
         }
 
         /* Secondary (일반) 버튼 */
@@ -480,8 +492,9 @@ def check_password():
             # 입력창 (위 카드 바로 아래에 배치)
             password = st.text_input("비밀번호", type="password", key="password_input", placeholder="접속 비밀번호를 입력하세요", label_visibility="collapsed")
             
-            # 비밀번호 입력 시에만 파란색 버튼으로 활성화
-            if st.button("로그인", use_container_width=True, type="primary" if password else "secondary"):
+            # 비밀번호 입력 여부에 따라 버튼 비활성화/활성화 처리 (회색 -> 파란색)
+            is_disabled = not bool(password)
+            if st.button("로그인", use_container_width=True, type="primary", disabled=is_disabled):
                 correct_password = get_secret("APP_PASSWORD", "ksys1234")
                 if password == correct_password:
                     st.session_state["password_correct"] = True

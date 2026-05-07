@@ -16,27 +16,32 @@ def inject_custom_css():
         /* Pretendard 폰트 로드 */
         @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
         
-        html, body, [class*="css"], .stMarkdown, p {
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif !important;
+        /* 강제 폰트 적용 (아이콘 폰트 제외) */
+        div, span, p, h1, h2, h3, h4, h5, h6, label, input, button, a {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+        }
+        .material-symbols-rounded, .material-icons, .stIcon, [class*="icon"], i, svg {
+            font-family: 'Material Symbols Rounded', 'Material Icons', sans-serif !important;
         }
         
-        /* 스트림릿 기본 요소 대비 강화 및 텍스트 강제 고정 */
+        /* 스트림릿 기본 요소 대비 강화 */
         .stMarkdown p, .stMarkdown div, .stMarkdown span, .stMetric div, .stRadio label {
             color: #191F28 !important;
         }
 
         /* 배경색 설정 */
-        .stApp {
-            background-color: #F2F4F7;
+        .stApp, .stApp > header {
+            background-color: #F9FAFB !important;
         }
 
         /* 카드 스타일 */
         .content-card {
             background-color: #FFFFFF;
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-            margin-bottom: 1.5rem;
+            padding: 2.5rem;
+            border-radius: 24px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+            margin-bottom: 2rem;
+            border: 1px solid #F2F4F6;
         }
 
         /* 제목 스타일 */
@@ -49,83 +54,140 @@ def inject_custom_css():
         /* 사이드바 스타일 */
         section[data-testid="stSidebar"] {
             background-color: #FFFFFF !important;
-            border-right: 1px solid #E5E8EB !important;
+            border-right: 1px solid #F2F4F6 !important;
         }
         
         section[data-testid="stSidebar"] .stMarkdown h1 {
-            font-size: 1.5rem !important;
-            margin-bottom: 2rem !important;
+            font-size: 1.4rem !important;
+            margin-bottom: 1.5rem !important;
+            color: #191F28 !important;
         }
 
-        /* 버튼 스타일 (미니멀 & 직관적) */
-        div[data-testid="stAppViewContainer"] .stButton>button[kind="primary"] {
-            background-color: #3182F6 !important; /* 토스 블루 */
-            color: white !important;
-            border-radius: 12px !important;
-            border: none !important;
-            padding: 0.6rem 1.5rem !important;
+        /* 버튼 스타일 공통 (미니멀 & 직관적) */
+        .stButton > button {
+            border-radius: 14px !important;
             font-weight: 600 !important;
+            transition: all 0.2s ease !important;
             width: 100%;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0, 100, 255, 0.1);
+            height: 3.5rem !important; /* 버튼 높이 증가 */
+            font-size: 1.1rem !important; /* 글자 크기 증가 */
+            padding: 0.6rem 1.5rem !important;
+            white-space: nowrap !important; /* 줄바꿈 방지 */
         }
-        div[data-testid="stAppViewContainer"] .stButton>button[kind="primary"]:hover {
-            background-color: #1B64DA !important;
+
+        /* Primary 버튼 (파란색 강제 적용 - 모든 주요 버튼 포함) */
+        .stApp button[data-testid*="primary"],
+        .stApp button[kind="primary"],
+        .stApp .stButton > button:first-child[class*="st-"] {
+            background-color: #3182F6 !important; /* 토스 블루 */
+            color: #FFFFFF !important;
+            border: none !important;
             box-shadow: 0 4px 12px rgba(49, 130, 246, 0.2) !important;
-            transform: translateY(-1px);
         }
-        
+        .stApp button[data-testid*="primary"]:hover,
+        .stApp button[kind="primary"]:hover {
+            background-color: #1B64DA !important;
+            box-shadow: 0 6px 16px rgba(49, 130, 246, 0.3) !important;
+            transform: translateY(-1px) !important;
+            color: #FFFFFF !important;
+        }
+
+        /* Secondary (일반) 버튼 */
+        button[data-testid="baseButton-secondary"] {
+            background-color: #FFFFFF !important;
+            color: #191F28 !important;
+            border: 1px solid #E5E8EB !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important;
+        }
+        button[data-testid="baseButton-secondary"]:hover {
+            background-color: #F9FAFB !important;
+            border-color: #D1D6DB !important;
+            color: #191F28 !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+        }
+
         /* 입력창 스타일 */
-        .stTextInput>div>div>input {
-            border-radius: 10px !important;
+        .stTextInput input, .stDateInput input {
+            border-radius: 14px !important;
             border: 1px solid #E5E8EB !important;
             padding: 0.8rem 1rem !important;
+            height: 3.5rem !important; /* 입력창 높이 통일 */
+            background-color: #F9FAFB !important;
+            color: #191F28 !important;
+            transition: all 0.2s ease !important;
+        }
+        .stTextInput input:focus, .stDateInput input:focus {
+            border-color: #3182F6 !important;
+            background-color: #FFFFFF !important;
+            box-shadow: 0 0 0 3px rgba(49, 130, 246, 0.1) !important;
         }
 
-        /* 탭 스타일 */
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 10px;
-            background-color: transparent;
+        /* 라디오 버튼 (메뉴 등) */
+        div[data-testid="stRadio"] > div {
+            gap: 0 !important;
+            background-color: #F2F4F6 !important;
+            padding: 4px !important;
+            border-radius: 14px !important;
+            display: inline-flex !important;
         }
-        .stTabs [data-baseweb="tab"] {
-            height: 45px;
-            background-color: white;
-            border-radius: 10px;
-            padding: 0 20px;
-            border: 1px solid #E5E8EB;
-            font-weight: 500;
+        div[data-testid="stRadio"] > div > label {
+            padding: 10px 20px !important;
+            border-radius: 10px !important;
+            margin: 0 !important;
+            background-color: transparent !important;
+            transition: all 0.2s ease !important;
+            cursor: pointer !important;
         }
-        .stTabs [aria-selected="true"] {
-            background-color: #0064FF !important;
-            color: white !important;
-            border: 1px solid #0064FF !important;
+        div[data-testid="stRadio"] > div > label:hover {
+            background-color: rgba(255, 255, 255, 0.5) !important;
         }
-
+        /* 라디오 활성화 상태 (선택된 메뉴) */
+        div[data-testid="stRadio"] > div > label[data-checked="true"] {
+            background-color: #3182F6 !important; /* 토스 블루로 변경 */
+            box-shadow: 0 4px 12px rgba(49, 130, 246, 0.2) !important;
+        }
+        /* 기본 라디오 원형 숨기기 */
+        div[data-testid="stRadio"] > div > label > div:first-child,
+        div[data-testid="stRadio"] div[data-baseweb="radio"] > div:first-child {
+            display: none !important;
+        }
+        div[data-testid="stRadio"] > div > label p {
+            font-weight: 600 !important;
+            color: #8B95A1 !important;
+            margin: 0 !important;
+            transition: color 0.2s ease !important;
+        }
+        /* 선택된 메뉴의 글자색을 흰색으로 */
+        div[data-testid="stRadio"] > div > label[data-checked="true"] p {
+            color: #FFFFFF !important;
+        }
+        
         /* 키워드 관리 행 스타일 (간격 축소 및 Hover 효과) */
-        .keyword-row {
+        div[data-testid="stHorizontalBlock"] {
             display: flex;
             align-items: center;
-            padding: 2px 8px;
+            padding: 4px 8px;
             margin: 2px 0;
             border-radius: 8px;
             transition: all 0.2s ease;
         }
-        .keyword-row:hover {
-            background-color: #F2F4F7;
+        div[data-testid="stHorizontalBlock"]:hover {
+            background-color: #F2F4F6;
         }
         
-        /* 삭제 버튼 및 즐겨찾기 버튼 공통 스타일 */
-        section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"] button {
+        /* 사이드바 아이콘 버튼 (즐겨찾기, 삭제 등) - 사이드바 내부로만 한정 */
+        section[data-testid="stSidebar"] .stButton > button {
             opacity: 0 !important;
-            width: 22px !important;
-            height: 22px !important;
-            min-height: 22px !important;
+            width: 28px !important;
+            height: 28px !important;
+            min-height: 28px !important;
             padding: 0 !important;
-            border-radius: 50% !important;
+            border-radius: 6px !important;
             background-color: transparent !important;
             color: transparent !important;
             border: none !important;
-            font-size: 12px !important;
+            font-size: 14px !important;
             transition: all 0.2s ease !important;
             box-shadow: none !important;
             display: flex !important;
@@ -134,92 +196,62 @@ def inject_custom_css():
         }
         
         /* 키워드 행에 마우스 올렸을 때 버튼들 노출 */
-        section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"]:hover button {
+        section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"]:hover .stButton > button {
             opacity: 1 !important;
-            background-color: #F2F4F7 !important;
+            background-color: #E5E8EB !important;
             color: #8B95A1 !important;
         }
         
-        /* 삭제 버튼 전용 (두 번째 버튼) 호버 시 빨간색 */
-        section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"] div:nth-child(3) button:hover {
-            background-color: #FF4B4B !important;
-            color: white !important;
+        /* 삭제 버튼 전용 호버 시 빨간색 */
+        section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"] div[data-testid="column"]:last-child .stButton > button:hover {
+            background-color: #FEEBEB !important;
+            color: #E91E63 !important;
         }
 
-        /* 즐겨찾기 버튼 전용 (첫 번째 버튼) 호버 시 노란색 */
-        section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"] div:nth-child(2) button:hover {
-            background-color: #FFD400 !important;
-            color: #191F28 !important;
+        /* 즐겨찾기 버튼 전용 호버 시 노란색 */
+        section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"] div[data-testid="column"]:nth-child(2) .stButton > button:hover {
+            background-color: #FFF8E1 !important;
+            color: #FF8F00 !important;
         }
 
-        /* 즐겨찾기 버튼이 활성화된 경우(노란색 별표) 시각적 피드백 강화 */
-        section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"] button[aria-label="★"] {
+        /* 즐겨찾기 활성화 상태 유지 */
+        section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"] .stButton > button[title="즐겨찾기 해제"] {
             opacity: 1 !important;
-            color: #FFD400 !important;
+            color: #FF8F00 !important;
+            background-color: transparent !important;
         }
 
-        /* 테이블 내부 스크롤 제거를 위한 스타일 */
+        /* 테이블 공통 컨테이너 */
         .modern-table-container {
             width: 100%;
             overflow-x: visible !important;
             overflow-y: visible !important;
         }
-        .modern-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-top: 10px;
-            border-radius: 12px;
-            border: 1px solid #F2F4F7;
-        }
-        .modern-table th {
-            background-color: #F9FAFB;
-            padding: 12px 16px;
-            text-align: left;
-            font-weight: 600;
-            color: #4E5968;
-            border-bottom: 1px solid #F2F4F7;
-        }
-        .modern-table td {
-            padding: 14px 16px;
-            border-bottom: 1px solid #F2F4F7;
-            color: #191F28;
-            vertical-align: middle;
-            font-size: 14px;
-        }
-        .modern-table td a {
-            color: #191F28;
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-        .modern-table td a:hover {
-            color: #0064FF !important;
-            text-decoration: underline !important;
-        }
-
+        
         /* 메트릭(KPI) 대비 강화 */
         [data-testid="stMetricValue"] div {
             color: #191F28 !important;
             font-weight: 700 !important;
+            font-size: 2rem !important;
         }
         [data-testid="stMetricLabel"] p {
-            color: #4E5968 !important;
-            font-weight: 500 !important;
-        }
-
-        /* 라디오 버튼(메뉴) 대비 강화 */
-        div[data-testid="stRadio"] label p {
-            color: #191F28 !important;
-            font-weight: 500 !important;
+            color: #8B95A1 !important;
+            font-weight: 600 !important;
+            font-size: 0.9rem !important;
         }
 
         /* 메트릭(KPI) 스타일 */
         [data-testid="stMetric"] {
-            background-color: white;
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-            border: 1px solid #F2F4F7;
+            background-color: #FFFFFF;
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border: 1px solid #F2F4F6;
+            transition: transform 0.2s ease;
+        }
+        [data-testid="stMetric"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.06);
         }
         
         /* 배지 스타일 */
@@ -237,13 +269,17 @@ def inject_custom_css():
 
         /* 비밀번호 컨테이너 */
         .login-box {
-            max-width: 450px;
-            margin: 100px auto;
-            padding: 50px;
-            background: white;
-            border-radius: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+            max-width: 400px;
+            margin: 80px auto;
+            padding: 40px;
+            background: #FFFFFF;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
             text-align: center;
+        }
+        /* 로그인 박스 내 간격 조정 */
+        [data-testid="stVerticalBlock"] > div:has(.login-box) + div {
+            margin-top: -20px !important;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -255,17 +291,19 @@ def render_sortable_html_table(df_display, classes='modern-table'):
     css = """
     <style>
         @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
-        body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; background-color: transparent; }
-        .modern-table { width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 12px; border: 1px solid #F2F4F7; }
-        .modern-table th { background-color: #F9FAFB; padding: 12px 16px; text-align: left; font-weight: 600; color: #4E5968; border-bottom: 1px solid #F2F4F7; cursor: pointer; user-select: none; transition: background-color 0.2s; }
-        .modern-table th:hover { background-color: #E5E8EB; }
-        .modern-table td { padding: 14px 16px; border-bottom: 1px solid #F2F4F7; color: #191F28; vertical-align: middle; font-size: 14px; }
-        .modern-table td a { color: #191F28; text-decoration: none; transition: color 0.2s ease; }
-        .modern-table td a:hover { color: #0064FF; text-decoration: underline; }
-        .badge { padding: 4px 12px; border-radius: 50px; font-size: 12px; font-weight: 600; display: inline-block; white-space: nowrap; }
-        .badge-green { background-color: #E6F4F1; color: #008485; }
-        .badge-red { background-color: #FEEBEB; color: #E91E63; }
-        .badge-yellow { background-color: #FFF8E1; color: #FF8F00; }
+        body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; margin: 0; padding: 0; background-color: transparent; }
+        .modern-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 10px; border-radius: 16px; border: 1px solid #E5E8EB; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02); }
+        .modern-table th { background-color: #F9FAFB; padding: 16px 20px; text-align: left; font-weight: 600; color: #4E5968; border-bottom: 1px solid #E5E8EB; cursor: pointer; user-select: none; transition: background-color 0.2s; font-size: 14px; }
+        .modern-table th:hover { background-color: #F2F4F6; }
+        .modern-table td { padding: 16px 20px; border-bottom: 1px solid #F2F4F6; color: #191F28; vertical-align: middle; font-size: 15px; background-color: #FFFFFF; transition: background-color 0.2s; }
+        .modern-table tr:hover td { background-color: #F9FAFB; }
+        .modern-table tr:last-child td { border-bottom: none; }
+        .modern-table td a { color: #191F28; text-decoration: none; font-weight: 500; transition: color 0.2s ease; }
+        .modern-table td a:hover { color: #3182F6; }
+        .badge { padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; display: inline-block; white-space: nowrap; }
+        .badge-green { background-color: #E8F5E9; color: #2E7D32; }
+        .badge-red { background-color: #FFEBEE; color: #C62828; }
+        .badge-yellow { background-color: #FFF8E1; color: #F57F17; }
     </style>
     """
     
@@ -398,13 +436,15 @@ def check_password():
             st.markdown("""
                 <div style='text-align: center; padding: 40px; background: white; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.05);'>
                     <h1 style='font-size: 50px; margin-bottom: 10px;'>📈</h1>
-                    <h2 style='color: #191F28; margin-bottom: 30px;'>마케팅 인사이트</h2>
+                    <h2 style='color: #191F28; margin-bottom: 30px;'>KSYS 마케팅 인사이트</h2>
                 </div>
             """, unsafe_allow_html=True)
             
             # 입력창 (위 카드 바로 아래에 배치)
             password = st.text_input("비밀번호", type="password", key="password_input", placeholder="접속 비밀번호를 입력하세요", label_visibility="collapsed")
-            if st.button("로그인", use_container_width=True, type="primary"):
+            
+            # 비밀번호 입력 시에만 파란색 버튼으로 활성화
+            if st.button("로그인", use_container_width=True, type="primary" if password else "secondary"):
                 correct_password = get_secret("APP_PASSWORD", "ksys1234")
                 if password == correct_password:
                     st.session_state["password_correct"] = True

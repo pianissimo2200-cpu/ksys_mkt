@@ -778,7 +778,6 @@ def main():
 
 
     elif selected_menu == "검색 트렌드 분석":
-
         st.subheader("키워드 검색 트렌드 분석")
         if not trend_keywords:
             st.info("👈 좌측에서 트렌드 분석 키워드를 추가해 주세요.")
@@ -818,9 +817,7 @@ def main():
                 else:
                     st.warning("기간을 시작일과 종료일 모두 선택해주세요.")
 
-
     elif selected_menu == "네이버 상위노출 추적":
-
         st.subheader("🏆 네이버 통합검색 상위노출 현황")
         if not rank_keywords:
             st.info("👈 좌측 설정에서 상위노출을 확인할 키워드를 관리해주세요.")
@@ -834,7 +831,13 @@ def main():
                         results = []
                         # 키워드 데이터 구조 호환성 처리
                         rk_list = [k['name'] if isinstance(k, dict) else k for k in rank_keywords]
-                        for kw in rk_list:
+                        
+                        # 진행 상태 표시를 위한 placeholder
+                        progress_bar = st.progress(0)
+                        status_text = st.empty()
+                        
+                        for i, kw in enumerate(rk_list):
+                            status_text.text(f"조회 중 ({i+1}/{len(rk_list)}): {kw}")
                             rank_data = fetch_naver_rank(kw, target_name)
                             # collector_utils의 fetch_naver_rank 결과를 기반으로 노출 여부 판별
                             is_found = 1 <= rank_data.get('rank', 999) <= 100
@@ -847,6 +850,7 @@ def main():
                                 title_html = title
         
                             results.append({
+                                "No": i + 1,
                                 "키워드": kw,
                                 "검색대상": target_name,
                                 "노출 여부": is_found,
@@ -854,8 +858,16 @@ def main():
                                 "블로그명": rank_data.get('blogger', '-'),
                                 "제목": title_html
                             })
+                            progress_bar.progress((i + 1) / len(rk_list))
+                            time.sleep(0.1) # API 부하 방지 및 안정성 확보
+                        
+                        status_text.empty()
+                        progress_bar.empty()
 
                 df = pd.DataFrame(results)
+                
+                # 상단에 요약 정보 표시
+                st.info(f"💡 총 {len(df)}개의 키워드 중 {len(df[df['노출 여부'] == True])}개가 100위권 내에 노출 중입니다.")
                 
                 # HTML 테이블 생성을 위한 커스텀 포맷터
                 def format_status(val):
@@ -873,8 +885,9 @@ def main():
                 df['순위/위치'] = df['순위/위치'].apply(format_rank)
 
                 html_content = render_sortable_html_table(df)
-                calc_height = len(df) * 48 + 50
+                calc_height = len(df) * 48 + 80
                 st.components.v1.html(html_content, height=calc_height, scrolling=False)
+
 
 
     elif selected_menu == "키워드 선점 추천":

@@ -870,33 +870,43 @@ def main():
                     df_csv = df_csv.drop(columns=['링크'])
                 csv_data = df_csv.to_csv(index=False).encode('utf-8-sig')
                 
-                # 버튼 스타일 고도화 (기본 회색 -> 호버 시 초록색)
+                # 버튼 스타일 정밀 고도화 (시인성 및 애니메이션 강화)
                 st.markdown("""
                     <style>
                     div.stDownloadButton > button {
                         white-space: nowrap !important;
-                        margin-top: 4px !important;
-                        background-color: #f0f2f6 !important;
-                        color: #31333f !important;
-                        border: 1px solid #dcdfe6 !important;
-                        border-radius: 8px !important;
-                        padding: 0.5rem 1rem !important;
-                        transition: all 0.3s ease !important;
-                        font-weight: 500 !important;
+                        width: 100% !important;
+                        height: 46px !important; /* 요약 박스와 균형을 맞춘 높이 */
+                        background-color: #f8f9fa !important;
+                        color: #191f28 !important;
+                        border: 1px solid #e5e8eb !important;
+                        border-radius: 12px !important;
+                        font-weight: 600 !important;
+                        font-size: 15px !important;
+                        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
                     }
                     div.stDownloadButton > button:hover {
                         background-color: #217346 !important; /* Excel Green */
                         color: white !important;
                         border-color: #217346 !important;
-                        box-shadow: 0 4px 12px rgba(33, 115, 70, 0.2) !important;
+                        transform: translateY(-2px) !important;
+                        box-shadow: 0 8px 20px rgba(33, 115, 70, 0.15) !important;
+                    }
+                    /* st.info 박스 하단 여백 제거하여 정렬 보정 */
+                    div.stAlert {
+                        margin-bottom: 0 !important;
                     }
                     </style>
                 """, unsafe_allow_html=True)
 
-                # 요약 정보와 버튼을 한 행에 배치하되, 버튼 공간을 더 넉넉히 확보 (0.7:0.3)
-                c1, c2 = st.columns([0.7, 0.3])
+                # 요약 정보와 버튼을 세로 가운데 정렬하여 배치
+                c1, c2 = st.columns([0.72, 0.28], vertical_alignment="center")
                 c1.info(f"💡 총 {len(df)}개의 키워드 중 {len(df[df['노출 여부'] == True])}개가 100위권 내에 노출 중입니다.")
-                c2.download_button("💾 CSV 다운로드", data=csv_data, file_name="naver_rank_results.csv", use_container_width=True)
+                c2.download_button("💾 결과 데이터 CSV 저장", data=csv_data, file_name="naver_rank_results.csv", use_container_width=True)
                 
                 # 화면 표시용 데이터 변환 (HTML 적용)
                 def make_title_clickable(row):

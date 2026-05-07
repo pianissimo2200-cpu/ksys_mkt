@@ -107,20 +107,58 @@ def inject_custom_css():
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
         }
 
-        /* 입력창 스타일 */
-        .stTextInput input, .stDateInput input {
+        /* 입력창 스타일 (텍스트) */
+        .stTextInput input {
             border-radius: 14px !important;
             border: 1px solid #E5E8EB !important;
             padding: 0.8rem 1rem !important;
-            height: 3.5rem !important; /* 입력창 높이 통일 */
+            height: 3.5rem !important;
             background-color: #F9FAFB !important;
             color: #191F28 !important;
             transition: all 0.2s ease !important;
         }
-        .stTextInput input:focus, .stDateInput input:focus {
+        .stTextInput input:focus {
             border-color: #3182F6 !important;
             background-color: #FFFFFF !important;
             box-shadow: 0 0 0 3px rgba(49, 130, 246, 0.1) !important;
+        }
+
+        /* 날짜 입력창 스타일 (세련되게) */
+        .stDateInput input {
+            border-radius: 12px !important;
+            border: 1px solid #E5E8EB !important;
+            padding: 0.8rem 1rem !important;
+            height: 3rem !important;
+            background-color: #FFFFFF !important;
+            color: #191F28 !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important;
+            font-weight: 500 !important;
+            text-align: center !important;
+            transition: all 0.2s ease !important;
+        }
+        .stDateInput input:focus {
+            border-color: #3182F6 !important;
+            box-shadow: 0 0 0 3px rgba(49, 130, 246, 0.1) !important;
+        }
+        .stDateInput div[data-baseweb="input"] {
+            background-color: transparent !important;
+            border: none !important;
+        }
+
+        /* 입력창 레이블(글씨) 가시성 개선 및 Expander 스타일 */
+        .stTextInput label p, .stDateInput label p {
+            color: #4E5968 !important;
+            font-weight: 600 !important;
+            font-size: 0.9rem !important;
+        }
+        [data-testid="stExpander"] details summary p {
+            color: #191F28 !important;
+            font-weight: 700 !important;
+        }
+        [data-testid="stExpander"] details {
+            background-color: #FFFFFF !important;
+            border: 1px solid #F2F4F6 !important;
+            border-radius: 16px !important;
         }
 
         /* 라디오 버튼 (메뉴 등) */
@@ -163,12 +201,13 @@ def inject_custom_css():
             color: #FFFFFF !important;
         }
         
-        /* 키워드 관리 행 스타일 (간격 축소 및 Hover 효과) */
+        /* 키워드/경쟁사 관리 행 스타일 (행간 축소 및 Hover) */
         div[data-testid="stHorizontalBlock"] {
             display: flex;
             align-items: center;
-            padding: 4px 8px;
-            margin: 2px 0;
+            gap: 0 !important;
+            margin: -4px 0 !important; /* 위아래 간격 축소 */
+            padding: 4px 8px !important;
             border-radius: 8px;
             transition: all 0.2s ease;
         }
@@ -176,8 +215,8 @@ def inject_custom_css():
             background-color: #F2F4F6;
         }
         
-        /* 사이드바 아이콘 버튼 (즐겨찾기, 삭제 등) - 사이드바 내부로만 한정 */
-        section[data-testid="stSidebar"] .stButton > button {
+        /* 리스트 행 내부 버튼(즐겨찾기, 삭제) 숨김 처리 */
+        div[data-testid="stHorizontalBlock"] button[kind="secondary"] {
             opacity: 0 !important;
             width: 28px !important;
             height: 28px !important;
@@ -185,37 +224,35 @@ def inject_custom_css():
             padding: 0 !important;
             border-radius: 6px !important;
             background-color: transparent !important;
-            color: transparent !important;
+            color: #8B95A1 !important;
             border: none !important;
-            font-size: 14px !important;
-            transition: all 0.2s ease !important;
             box-shadow: none !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
+            transition: all 0.2s ease !important;
         }
         
         /* 키워드 행에 마우스 올렸을 때 버튼들 노출 */
-        section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"]:hover .stButton > button {
+        div[data-testid="stHorizontalBlock"]:hover button[kind="secondary"] {
             opacity: 1 !important;
-            background-color: #E5E8EB !important;
-            color: #8B95A1 !important;
+            background-color: transparent !important;
         }
         
         /* 삭제 버튼 전용 호버 시 빨간색 */
-        section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"] div[data-testid="column"]:last-child .stButton > button:hover {
+        div[data-testid="stHorizontalBlock"] div[data-testid="column"]:last-child button[kind="secondary"]:hover {
             background-color: #FEEBEB !important;
             color: #E91E63 !important;
         }
 
         /* 즐겨찾기 버튼 전용 호버 시 노란색 */
-        section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"] div[data-testid="column"]:nth-child(2) .stButton > button:hover {
+        div[data-testid="stHorizontalBlock"] div[data-testid="column"]:nth-child(2) button[kind="secondary"]:hover {
             background-color: #FFF8E1 !important;
             color: #FF8F00 !important;
         }
 
         /* 즐겨찾기 활성화 상태 유지 */
-        section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"] .stButton > button[title="즐겨찾기 해제"] {
+        div[data-testid="stHorizontalBlock"] button[title="즐겨찾기 해제"] {
             opacity: 1 !important;
             color: #FF8F00 !important;
             background-color: transparent !important;

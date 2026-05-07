@@ -190,7 +190,10 @@ def inject_custom_css():
             cursor: pointer !important;
         }
         div[data-testid="stRadio"] > div > label:hover {
-            background-color: rgba(255, 255, 255, 0.5) !important;
+            background-color: #3182F6 !important;
+        }
+        div[data-testid="stRadio"] > div > label:hover p {
+            color: #FFFFFF !important;
         }
         /* 라디오 활성화 상태 (선택된 메뉴) */
         div[data-testid="stRadio"] > div > label[data-checked="true"] {

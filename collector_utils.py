@@ -43,7 +43,7 @@ MEDIA_MAP = {
     "dailian.co.kr": "데일리안", "viewsnnews.com": "뷰스앤뉴스", "newdaily.co.kr": "뉴데일리",
     "sbs.co.kr": "SBS", "kbs.co.kr": "KBS", "mbc.co.kr": "MBC", "ytn.co.kr": "YTN",
     "news.tvchosun.com": "TV조선", "channela.com": "채널A", "jtbc.co.kr": "JTBC",
-    "mbn.co.kr": "MBN", "ebs.co.kr": "EBS", "zdnet.co.kr": "ZDNet Korea",
+    "mbn.co.kr": "MBN", "ebs.co.kr": "EBS", "zdnet.co.kr": "지디넷코리아",
     "bloter.net": "블로터", "inews24.com": "아이뉴스24", "digitaltoday.co.kr": "디지털투데이",
     "dt.co.kr": "디지털타임스", "etnews.com": "전자신문", "koit.co.kr": "정보통신신문",
     "ksilbo.co.kr": "경상일보", "kwnews.co.kr": "강원일보", "kyeonggi.com": "경기일보",
@@ -58,7 +58,11 @@ MEDIA_MAP = {
     "starnewskorea.com": "스타뉴스", "gukjenews.com": "국제뉴스", "etoday.co.kr": "이투데이",
     "ajunews.com": "아주경제", "heraldcorp.com": "헤럴드경제", "wowtv.co.kr": "한국경제TV",
     "bizwnews.com": "비즈월드", "lawissue.co.kr": "로이슈", "beyondpost.co.kr": "비욘드포스트",
-    "pointp.co.kr": "포인트데일리",
+    "pointp.co.kr": "포인트데일리", "ziksir.com": "직썰", "yonhapnewstv.co.kr": "연합뉴스TV",
+    "womentimes.co.kr": "우먼타임스", "viva100.com": "브릿지경제", "tvreport.co.kr": "TV리포트",
+    "thepublic.kr": "더퍼블릭", "thedrive.co.kr": "더드라이브", "tenasia.co.kr": "텐아시아",
+    "spotvnews.co.kr": "스포티비뉴스", "public25.com": "퍼블릭뉴스", "press9.kr": "프레스나인",
+    "pointdaily.co.kr": "포인트데일리", "pinpointnews.co.kr": "핀포인트뉴스"
 }
 
 def get_media_name(domain):

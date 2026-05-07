@@ -123,8 +123,9 @@ def inject_custom_css():
         .stTextInput input {
             border-radius: 14px !important;
             border: 1px solid #E5E8EB !important;
-            padding: 0.8rem 1rem !important;
+            padding: 0 1.2rem !important; /* 좌우 패딩만 유지, 상하는 0으로 하여 height와 line-height로 정렬 */
             height: 3.5rem !important;
+            line-height: 3.5rem !important; /* height와 동일하게 하여 세로 중앙 정렬 */
             background-color: #F9FAFB !important;
             color: #191F28 !important;
             transition: all 0.2s ease !important;
@@ -139,8 +140,9 @@ def inject_custom_css():
         .stDateInput input {
             border-radius: 12px !important;
             border: 1px solid #E5E8EB !important;
-            padding: 0.8rem 1rem !important;
+            padding: 0 1rem !important;
             height: 3rem !important;
+            line-height: 3rem !important; /* 세로 중앙 정렬 */
             background-color: #FFFFFF !important;
             color: #191F28 !important;
             box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important;
@@ -345,9 +347,9 @@ def render_sortable_html_table(df_display, classes='modern-table'):
         @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
         body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; margin: 0; padding: 0; background-color: transparent; }
         .modern-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 10px; border-radius: 16px; border: 1px solid #E5E8EB; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02); }
-        .modern-table th { background-color: #F9FAFB; padding: 16px 20px; text-align: left; font-weight: 600; color: #4E5968; border-bottom: 1px solid #E5E8EB; cursor: pointer; user-select: none; transition: background-color 0.2s; font-size: 14px; }
+        .modern-table th { background-color: #F9FAFB; padding: 10px 20px; text-align: left; font-weight: 600; color: #4E5968; border-bottom: 1px solid #E5E8EB; cursor: pointer; user-select: none; transition: background-color 0.2s; font-size: 14px; }
         .modern-table th:hover { background-color: #F2F4F6; }
-        .modern-table td { padding: 16px 20px; border-bottom: 1px solid #F2F4F6; color: #191F28; vertical-align: middle; font-size: 15px; background-color: #FFFFFF; transition: background-color 0.2s; }
+        .modern-table td { padding: 10px 20px; border-bottom: 1px solid #F2F4F6; color: #191F28; vertical-align: middle; font-size: 15px; background-color: #FFFFFF; transition: background-color 0.2s; }
         .modern-table tr:hover td { background-color: #F9FAFB; }
         .modern-table tr:last-child td { border-bottom: none; }
         .modern-table td a { color: #191F28; text-decoration: none; font-weight: 500; transition: color 0.2s ease; }

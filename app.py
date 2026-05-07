@@ -1,6 +1,7 @@
 import time
 import os
 import datetime
+import base64
 import pandas as pd
 import streamlit as st
 import plotly.express as px
@@ -734,8 +735,6 @@ def main():
             df_csv = df.copy()
             csv_data = df_csv.to_csv(index=False).encode('utf-8-sig')
             
-            import base64
-            import datetime
             b64 = base64.b64encode(csv_data).decode()
             today_str = datetime.datetime.now().strftime("%Y%m%d")
             csv_filename = f"{today_str}_뉴스브리핑.csv"
@@ -930,7 +929,6 @@ def main():
                 csv_data = df_csv.to_csv(index=False).encode('utf-8-sig')
                 
                 # 요약 정보와 다운로드 버튼을 하나의 일체형 행(Row)으로 구성하여 완벽한 심미성 확보
-                import base64
                 b64 = base64.b64encode(csv_data).decode()
                 
                 # 다운로드 파일명 동적 생성 (예: 20260507_상위노출현황.csv)

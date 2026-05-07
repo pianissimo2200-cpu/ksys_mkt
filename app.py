@@ -689,17 +689,17 @@ def main():
                 st.rerun()
 
     # --- 상단 요약 지표 (Summary Metrics) ---
-    st.markdown("<br>", unsafe_allow_html=True)
+
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("뉴스 키워드", f"{len(keywords)}개")
     m2.metric("경쟁사 블로그", f"{len(competitors)}개")
     m3.metric("상위노출 추적", f"{len(rank_keywords)}개")
     m4.metric("수집 기간", f"{(end_date - start_date).days}일")
-    st.markdown("<br>", unsafe_allow_html=True)
+
 
     # ===== 메뉴별 화면 렌더링 =====
     if selected_menu == "뉴스 통합 브리핑":
-        st.markdown('<div class="content-card">', unsafe_allow_html=True)
+
         st.subheader("뉴스 통합 브리핑")
         if st.button("뉴스 수집 시작", type="primary", use_container_width=True, key="news_fetch_btn"):
             if not CLIENT_ID or not CLIENT_SECRET:
@@ -737,10 +737,10 @@ def main():
             html_content = render_sortable_html_table(df_display)
             calc_height = len(df_display) * 48 + 50
             st.components.v1.html(html_content, height=calc_height, scrolling=False)
-        st.markdown('</div>', unsafe_allow_html=True)
+
 
     elif selected_menu == "경쟁사 포스팅 분석":
-        st.markdown('<div class="content-card">', unsafe_allow_html=True)
+
         st.markdown("### 🔍 경쟁사 최신 포스팅 수집")
         if st.button("경쟁사 포스팅 가져오기", type="primary", use_container_width=True):
             all_blogs = []
@@ -775,10 +775,10 @@ def main():
             st.components.v1.html(html_content, height=calc_height, scrolling=False)
             
 
-        st.markdown('</div>', unsafe_allow_html=True)
+
 
     elif selected_menu == "검색 트렌드 분석":
-        st.markdown('<div class="content-card">', unsafe_allow_html=True)
+
         st.subheader("키워드 검색 트렌드 분석")
         if not trend_keywords:
             st.info("👈 좌측에서 트렌드 분석 키워드를 추가해 주세요.")
@@ -817,10 +817,10 @@ def main():
                         st.download_button("📊 CSV 다운로드", data=df_nv.to_csv(index=False).encode('utf-8'), file_name="trend_analysis.csv")
                 else:
                     st.warning("기간을 시작일과 종료일 모두 선택해주세요.")
-        st.markdown('</div>', unsafe_allow_html=True)
+
 
     elif selected_menu == "네이버 상위노출 추적":
-        st.markdown('<div class="content-card">', unsafe_allow_html=True)
+
         st.subheader("🏆 네이버 통합검색 상위노출 현황")
         if not rank_keywords:
             st.info("👈 좌측 설정에서 상위노출을 확인할 키워드를 관리해주세요.")
@@ -875,10 +875,10 @@ def main():
                 html_content = render_sortable_html_table(df)
                 calc_height = len(df) * 48 + 50
                 st.components.v1.html(html_content, height=calc_height, scrolling=False)
-        st.markdown('</div>', unsafe_allow_html=True)
+
 
     elif selected_menu == "키워드 선점 추천":
-        st.markdown('<div class="content-card">', unsafe_allow_html=True)
+
         st.subheader("LED 전광판 특화 키워드 선점 전략")
         st.markdown("""
         이 메뉴는 AI가 **LED 전광판** 시장의 흐름을 분석하여, 현재 우리가 네이버 블로그에서 선점하면 좋은 알짜배기 키워드들을 제안해 드립니다.
@@ -898,7 +898,7 @@ def main():
                     suggestions = ai_utils.generate_led_keywords(target_key, model_type=m_type)
                     st.markdown(suggestions)
                     st.download_button("💡 키워드 제안서 다운로드", data=suggestions, file_name=f"led_keyword_strategy_{m_type}.md")
-        st.markdown('</div>', unsafe_allow_html=True)
+
 
 if __name__ == "__main__":
     main()

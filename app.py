@@ -870,12 +870,20 @@ def main():
                     df_csv = df_csv.drop(columns=['링크'])
                 csv_data = df_csv.to_csv(index=False).encode('utf-8-sig')
                 
-                # 상단에 요약 정보 표시 (전체 너비 사용으로 시원하게 배치)
-                st.info(f"💡 총 {len(df)}개의 키워드 중 {len(df[df['노출 여부'] == True])}개가 100위권 내에 노출 중입니다.")
-                
-                # 표 바로 위에 우측 정렬로 다운로드 버튼 배치 (공간 확보로 텍스트 깨짐 방지)
-                col_empty, col_btn = st.columns([0.85, 0.15])
-                col_btn.download_button("⬇️ CSV 파일 저장", data=csv_data, file_name="naver_rank_results.csv", use_container_width=True)
+                # 버튼 텍스트 줄바꿈 방지를 위한 CSS 주입
+                st.markdown("""
+                    <style>
+                    div.stDownloadButton > button {
+                        white-space: nowrap !important;
+                        margin-top: 4px !important;
+                    }
+                    </style>
+                """, unsafe_allow_html=True)
+
+                # 요약 정보와 버튼을 한 행에 배치하되, 버튼 공간을 더 넉넉히 확보 (0.7:0.3)
+                c1, c2 = st.columns([0.7, 0.3])
+                c1.info(f"💡 총 {len(df)}개의 키워드 중 {len(df[df['노출 여부'] == True])}개가 100위권 내에 노출 중입니다.")
+                c2.download_button("💾 CSV 다운로드", data=csv_data, file_name="naver_rank_results.csv", use_container_width=True)
                 
                 # 화면 표시용 데이터 변환 (HTML 적용)
                 def make_title_clickable(row):

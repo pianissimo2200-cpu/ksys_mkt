@@ -870,45 +870,51 @@ def main():
                     df_csv = df_csv.drop(columns=['링크'])
                 csv_data = df_csv.to_csv(index=False).encode('utf-8-sig')
                 
-                # 버튼 스타일 정밀 고도화 (시인성 및 애니메이션 강화)
-                st.markdown("""
-                    <style>
-                    [data-testid="stDownloadButton"] button {
-                        white-space: nowrap !important;
-                        width: 100% !important;
-                        height: 48px !important; /* 요약 박스와 균형을 맞춘 높이 */
-                        background-color: #f0f2f6 !important;
-                        border: 1px solid #dcdfe6 !important;
-                        border-radius: 12px !important;
-                        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
-                    }
-                    [data-testid="stDownloadButton"] button p {
-                        color: #191f28 !important; /* 기본 검정 텍스트 */
-                        font-weight: 600 !important;
-                        font-size: 15px !important;
-                        transition: color 0.2s ease !important;
-                    }
-                    [data-testid="stDownloadButton"] button:hover {
-                        background-color: #217346 !important; /* Excel Green */
-                        border-color: #217346 !important;
-                        transform: translateY(-2px) !important;
-                        box-shadow: 0 8px 20px rgba(33, 115, 70, 0.2) !important;
-                    }
-                    [data-testid="stDownloadButton"] button:hover p {
-                        color: #ffffff !important; /* 호버 시 흰색 텍스트 */
-                    }
-                    /* st.info 박스 하단 여백 제거하여 정렬 보정 */
-                    div.stAlert {
-                        margin-bottom: 0 !important;
-                    }
-                    </style>
-                """, unsafe_allow_html=True)
-
+                # 완벽하게 커스텀된 다운로드 버튼 (HTML/CSS 직접 주입)
+                import base64
+                b64 = base64.b64encode(csv_data).decode()
+                
+                custom_btn_html = f"""
+                <style>
+                .custom-csv-btn {{
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 100%;
+                    height: 48px;
+                    background-color: #f0f2f6;
+                    color: #191f28 !important;
+                    border: 1px solid #dcdfe6;
+                    border-radius: 12px;
+                    font-weight: 600;
+                    font-size: 15px;
+                    text-decoration: none !important;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+                    white-space: nowrap;
+                    padding: 0 16px;
+                }}
+                .custom-csv-btn:hover {{
+                    background-color: #217346 !important;
+                    color: white !important;
+                    border-color: #217346 !important;
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 20px rgba(33, 115, 70, 0.2);
+                }}
+                /* st.info 박스 하단 여백 제거하여 정렬 보정 */
+                div.stAlert {{
+                    margin-bottom: 0 !important;
+                }}
+                </style>
+                <a href="data:file/csv;base64,{b64}" download="naver_rank_results.csv" class="custom-csv-btn">
+                    💾 결과 데이터 CSV 저장
+                </a>
+                """
+                
                 # 요약 정보와 버튼을 세로 가운데 정렬하여 배치
                 c1, c2 = st.columns([0.72, 0.28], vertical_alignment="center")
                 c1.info(f"💡 총 {len(df)}개의 키워드 중 {len(df[df['노출 여부'] == True])}개가 100위권 내에 노출 중입니다.")
-                c2.download_button("💾 결과 데이터 CSV 저장", data=csv_data, file_name="naver_rank_results.csv", use_container_width=True)
+                c2.markdown(custom_btn_html, unsafe_allow_html=True)
                 
                 # 화면 표시용 데이터 변환 (HTML 적용)
                 def make_title_clickable(row):

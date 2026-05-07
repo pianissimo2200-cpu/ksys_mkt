@@ -872,7 +872,12 @@ def main():
                 
                 # 요약 정보와 다운로드 버튼을 하나의 일체형 행(Row)으로 구성하여 완벽한 심미성 확보
                 import base64
+                import datetime
                 b64 = base64.b64encode(csv_data).decode()
+                
+                # 다운로드 파일명 동적 생성 (예: 20260507_상위노출현황.csv)
+                today_str = datetime.datetime.now().strftime("%Y%m%d")
+                csv_filename = f"{today_str}_상위노출현황.csv"
                 
                 info_text = f"총 {len(df)}개의 키워드 중 {len(df[df['노출 여부'] == True])}개가 100위권 내에 노출 중입니다."
                 
@@ -883,7 +888,7 @@ def main():
                         💡 {info_text}
                     </div>
                     <!-- 다운로드 버튼 (우측) -->
-                    <a href="data:file/csv;base64,{b64}" download="naver_rank_results.csv" class="custom-csv-btn">
+                    <a href="data:file/csv;base64,{b64}" download="{csv_filename}" class="custom-csv-btn">
                         💾 결과 데이터 CSV 저장
                     </a>
                 </div>

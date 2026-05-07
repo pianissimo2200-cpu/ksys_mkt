@@ -872,7 +872,6 @@ def main():
                 
                 # 요약 정보와 다운로드 버튼을 하나의 일체형 행(Row)으로 구성하여 완벽한 심미성 확보
                 import base64
-                import datetime
                 b64 = base64.b64encode(csv_data).decode()
                 
                 # 다운로드 파일명 동적 생성 (예: 20260507_상위노출현황.csv)

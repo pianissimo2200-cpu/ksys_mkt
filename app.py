@@ -729,13 +729,69 @@ def main():
             # 발행일 컬럼 기본 정렬 (최신순)
             if '발행일' in df.columns:
                 df = df.sort_values(by='발행일', ascending=False)
+            
+            # --- CSV 다운로드 생성 (HTML 적용 전 순수 데이터) ---
+            df_csv = df.copy()
+            csv_data = df_csv.to_csv(index=False).encode('utf-8-sig')
+            
+            import base64
+            import datetime
+            b64 = base64.b64encode(csv_data).decode()
+            today_str = datetime.datetime.now().strftime("%Y%m%d")
+            csv_filename = f"{today_str}_뉴스브리핑.csv"
+            
+            info_text = f"총 {len(df)}건의 최신 뉴스 데이터가 수집되었습니다."
+            
+            unified_row_html = f"""
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 10px; margin-bottom: 20px; width: 100%;">
+                <!-- 요약 정보 박스 (좌측) -->
+                <div style="flex: 1; display: flex; align-items: center; background-color: #F0F5FF; color: #1B64DA; padding: 0 20px; border-radius: 12px; height: 52px; font-weight: 600; font-size: 15px; border: 1px solid #D1E0FF; box-shadow: 0 2px 4px rgba(0,0,0,0.01);">
+                    💡 {info_text}
+                </div>
+                <!-- 다운로드 버튼 (우측) -->
+                <a href="data:file/csv;base64,{b64}" download="{csv_filename}" class="custom-csv-btn">
+                    💾 결과 데이터 CSV 저장
+                </a>
+            </div>
+            <style>
+            .custom-csv-btn {{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 220px;
+                height: 52px; /* 좌측 박스와 완벽히 동일한 높이 */
+                background-color: #f0f2f6;
+                color: #191f28 !important;
+                border: 1px solid #dcdfe6;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 15px;
+                text-decoration: none !important;
+                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+                white-space: nowrap;
+                padding: 0 24px;
+            }}
+            .custom-csv-btn:hover {{
+                background-color: #217346 !important;
+                color: white !important;
+                border-color: #217346 !important;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(33, 115, 70, 0.2);
+            }}
+            </style>
+            """
+            st.markdown(unified_row_html, unsafe_allow_html=True)
+            # ------------------------------------------------
                         
             # 제목을 클릭 가능한 링크로 변환하고 링크 컬럼 제거
             def make_title_clickable(row):
                 return f'<a href="{row["링크"]}" target="_blank" style="text-decoration:none; color:#191F28; font-weight:600;">{row["제목"]}</a>'
             
             df['제목'] = df.apply(make_title_clickable, axis=1)
-            df_display = df[['키워드', '제목', '언론사', '발행일']].copy()
+            
+            # 사용자 요청에 따른 컬럼 순서 변경: 키워드/발행일/제목/언론사
+            df_display = df[['키워드', '발행일', '제목', '언론사']].copy()
             
             html_content = render_sortable_html_table(df_display)
             calc_height = len(df_display) * 48 + 50
